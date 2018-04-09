@@ -1,21 +1,22 @@
 rwildcard = $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2) $(filter $(subst *,%,$2),$d))
 SRC = $(call rwildcard, src/, *.c) #$(wildcard src/*.cpp) $(wildcard src/engine/*.cpp)
 OBJ = $(patsubst src/%.c, obj/%.o, $(SRC))
-CFLAGS = --std=c11 -Wno-incompatible-pointer-types -Wno-int-conversion -Wno-unused-value -Isrc/
+CFLAGS = --std=c11 -Wno-incompatible-pointer-types -Wno-int-conversion -Wno-unused-value -Isrc/ -L/usr/lib/x86_64-linux-gnu/mesa/
 NAME = arcade
 OUT =
 
-LDFLAGS = -Wl,-allow-multiple-definition -static -static-libgcc
+LDFLAGS = -Wl,-allow-multiple-definition -static-libgcc
 LIBS = 
 CC = 
 ifeq ($(OS),Windows_NT)
 	OUT = $(NAME).exe
 	CC += clang
+	LDFLAGS += static
 	LIBS = -lraylib -lopengl32 -lgdi32 -llua
 else
 	OUT = $(NAME)
 	CC += clang
-	LIBS = -lraylib -lglfw3 -lGL -lXxf86vm -lXext -lX11 -lXrandr -lXinerama -lXcursor -lm -lpthread -ldl 
+	LIBS = -lraylib -lGL -lXxf86vm -lXext -lX11 -lXrandr -lXinerama -lXcursor -llua5.3 -lm -lpthread -ldl
 endif
 
 all: $(OUT)

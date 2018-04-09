@@ -7,7 +7,11 @@
 
 #include <raylib.h>
 #include <raymath.h>
-#include <lua.h>
+#ifdef __unix__
+    #include <lua5.3/lua.h>
+#else
+    #include <lua.h>
+#endif
 
 #include "resource.h"
 
