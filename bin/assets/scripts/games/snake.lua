@@ -189,7 +189,9 @@ function update(dt)
 end
 
 function draw()
-    arcade.ClearColor(25, 25, 25, 255)
+    -- arcade.ClearColor(25, 25, 25, 255)
+    arcade.SetColor(25, 25, 25, 255)
+    arcade.DrawRectangle("fill", 0, 0, arcade.width, arcade.height)
     
     if not dead then
         

@@ -9,23 +9,10 @@ static Camera camera;
 static bool interacting = false;
 static Vector2 save_mouse = (Vector2){0, 0};
 static Vector3 light_position = (Vector3){1.5, 3, 2};
+
 static Shader* lighting;
 static int light_position_location;
-
-static void DrawGizmoNormal(Vector3 position, Vector3 normal)
-{
-    DrawLine3D(position, Vector3Add(position, normal), (Color){0, 255, 255, 255});
-    
-    Matrix m = MatrixIdentity();
-    m = MatrixMultiply(m, MatrixRotateX(90*DEG2RAD));
-    Vector3 p = Vector3Transform(normal, m);
-    DrawLine3D(position, Vector3Add(position, p), (Color){0, 255, 255, 255});
-    
-    m = MatrixIdentity();
-    m = MatrixMultiply(m, MatrixRotateY(90*DEG2RAD));
-    p = Vector3Transform(normal, m);
-    DrawLine3D(position, Vector3Add(position, p), (Color){0, 255, 255, 255});
-}
+static int light_viewpos_location;
 
 void play_init()
 {
@@ -36,9 +23,11 @@ void play_init()
     resource_loadmodel("assets/models/Arcade2_screen.obj", NULL, "arcade2_screen");
     
     resource_loadshader("assets/shaders/light.vs", "assets/shaders/light.fs", "simple_lighting");
+    resource_loadshader("assets/shaders/light.vs", "assets/shaders/vignette.fs", "vignette");
     
     lighting = resource_getshader("simple_lighting");
     light_position_location = GetShaderLocation(*lighting, "lightPos");
+    light_viewpos_location = GetShaderLocation(*lighting, "viewPos");
     lighting->locs[LOC_MATRIX_MODEL] = GetShaderLocation(*lighting, "modelMatrix");
     resource_getmodel("arcade1")->material.shader = *lighting;
     resource_getmodel("arcade2")->material.shader = *lighting;
@@ -48,6 +37,9 @@ void play_init()
     
     cabinet_rotate(&arcade1, 0, -0.3, 0);
     cabinet_rotate(&arcade2, 0, 0.3, 0);
+    
+    cabinet_setshader(&arcade2, "vignette");
+    
     arcade2.position = (Vector3){3, 0, -0.75};
     
     camera = (Camera){{0, 3.5, 5}, {0, 3, 0}, {0, 1, 0}, 90.f};
@@ -89,6 +81,9 @@ void play_update(float dt)
     light_position.x = 1.5+cos(GetTime())*3;
     light_position.z = sin(GetTime())*3;
     
+    SetShaderValue(*lighting, light_position_location, &light_position, 3);
+    SetShaderValue(*lighting, light_viewpos_location, &camera.position, 3);
+    
     cabinet_update(&arcade1);
     cabinet_update(&arcade2);
     
@@ -103,18 +98,12 @@ void play_draw()
     RayHitInfo h2 = GetCollisionRayModel(r, arcade2.screen);
     
     Begin3dMode(camera);
-        DrawGrid(100, 1);
-        
-        DrawGizmo(h1.position);
-        DrawGizmo(h2.position);
-        // DrawGizmoNormal(h1.position, h1.normal);
-        // DrawGizmoNormal(h2.position, h2.normal);
+        // DrawGrid(100, 1);
         
         cabinet_draw(&arcade1);
         cabinet_draw(&arcade2);
         
         DrawSphereWires(light_position, 0.1, 6, 6, WHITE);
-        SetShaderValue(*lighting, light_position_location, &light_position, 3);
         
         cabinet_drawgame(&arcade1);
         cabinet_drawgame(&arcade2);

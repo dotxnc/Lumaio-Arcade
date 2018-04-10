@@ -138,6 +138,8 @@ void cabinet_init(cabinet_t* cabinet, const char* model_name, const char* script
     char screen_name[64];
     sprintf(screen_name, "%s_screen", model_name);
     
+    cabinet->shader = NULL;
+    
     cabinet->interacting = false;
     
     cabinet->machine = resource_getmodel(model_name);
@@ -245,6 +247,11 @@ void cabinet_rotate(cabinet_t* cabinet, float x, float y, float z)
     cabinet->rotation = r;
 }
 
+void cabinet_setshader(cabinet_t* cabinet, const char* name)
+{
+    cabinet->shader = resource_getshader(name);
+}
+
 void cabinet_update(cabinet_t* cabinet)
 {
     // printf("Interacting %s\n", is_interacting(cabinet->L) ? "true" : "false");
@@ -293,7 +300,14 @@ void cabinet_drawgame(cabinet_t* cabinet)
     BeginTextureMode(cabinet->target);
         static Rectangle sr = (Rectangle){0, 0, 512, 512};
         static Rectangle dr = (Rectangle){0, 0, 512, 512};
-        DrawTexturePro(cabinet->temp.texture, sr, dr, (Vector2){0, 0}, 0, WHITE);
+        
+        if (cabinet->shader != NULL) {
+            BeginShaderMode(*(cabinet->shader));
+                DrawTexturePro(cabinet->temp.texture, sr, dr, (Vector2){0, 0}, 0, WHITE);
+            EndShaderMode();
+        } else {
+            DrawTexturePro(cabinet->temp.texture, sr, dr, (Vector2){0, 0}, 0, WHITE);
+        }
     EndTextureMode();
 }
 

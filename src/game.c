@@ -47,6 +47,5 @@ void game_start(game_t* game)
 
 void game_shutdown(game_t* game)
 {
-    CloseVrSimulator();
     CloseWindow();
 }

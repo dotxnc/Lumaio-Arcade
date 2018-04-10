@@ -21,6 +21,8 @@ typedef struct cabinet_t {
     Vector3 position;
     Matrix rotation;
     
+    Shader* shader;
+    
     RenderTexture2D target;
     RenderTexture2D temp;
     
@@ -33,6 +35,7 @@ typedef struct cabinet_t {
 
 void cabinet_init(cabinet_t*, const char*, const char*);
 void cabinet_rotate(cabinet_t*, float, float, float);
+void cabinet_setshader(cabinet_t*, const char*);
 void cabinet_update(cabinet_t*);
 void cabinet_draw(cabinet_t*);
 void cabinet_drawgame(cabinet_t*);
