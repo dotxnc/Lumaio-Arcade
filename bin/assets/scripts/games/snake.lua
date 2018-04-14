@@ -22,7 +22,8 @@ local red = {255, 0, 0, 255}
 local green = {0, 255, 0, 255}
 
 function initialize_snake()
-    print("initializing snake...")
+    -- print("initializing snake...")
+    Conout("[SNAKE] initializing...")
     
     dead = false
     elapsed = 0

@@ -2,6 +2,7 @@
 #include <raylib.h>
 #include "resource.h"
 #include "cabinet.h"
+#include "console.h"
 
 static cabinet_t arcade1;
 static cabinet_t arcade2;
@@ -16,6 +17,8 @@ static int light_viewpos_location;
 
 void play_init()
 {
+    console_init();
+    
     resource_loadmodel("assets/models/Arcade1.obj", "assets/textures/Arcade1_texture.png", "arcade1");
     resource_loadmodel("assets/models/Arcade1_screen.obj", NULL, "arcade1_screen");
     
@@ -48,8 +51,18 @@ void play_init()
 
 void play_update(float dt)
 {
+    if (IsKeyPressed(KEY_TAB)) {
+        console_toggle();
+    }
+    
     if (IsKeyPressed(KEY_E)) {
         // check if looking at cabinet
+        
+        if (console_get("console_check")) {
+            console_pushnumber(GetTime());
+            console_call();
+        }
+        
         Ray r;
         r.position = camera.position;
         r.direction = Vector3Subtract(camera.target, camera.position);
@@ -110,6 +123,7 @@ void play_draw()
         
     End3dMode();
     
+    console_draw();
     if (h1.hit || h2.hit) {
         DrawText("HIT", 10, 10, 20, RED);
     }

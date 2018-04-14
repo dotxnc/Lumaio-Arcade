@@ -1,6 +1,7 @@
 #include "cabinet.h"
 
 #include <raymath.h>
+#include "console.h"
 
 #ifdef __unix__
     #include <lua5.3/lua.h>
@@ -232,6 +233,9 @@ void cabinet_init(cabinet_t* cabinet, const char* model_name, const char* script
     
     // arcade global
     lua_setglobal(cabinet->L, "arcade");
+    
+    lua_pushcfunction(cabinet->L, &lua_Conout);
+    lua_setglobal(cabinet->L, "Conout");
     
     // prime script
     lua_pcall(cabinet->L, 0, 0, NULL);
