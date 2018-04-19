@@ -14,6 +14,8 @@
 #endif
 
 #include "resource.h"
+#include "world.h"
+#include "util/hashmap.h"
 
 typedef struct cabinet_t {
     Model* machine;
@@ -34,6 +36,7 @@ typedef struct cabinet_t {
 } cabinet_t;
 
 void cabinet_init(cabinet_t*, const char*, const char*);
+void cabinet_reload(cabinet_t*);
 void cabinet_rotate(cabinet_t*, float, float, float);
 void cabinet_setshader(cabinet_t*, const char*);
 void cabinet_update(cabinet_t*);

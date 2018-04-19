@@ -1,7 +1,7 @@
 
 getmetatable('').__index = function(str,i) return string.sub(str,i,i) end
 
-local text = "Hello from lua!"
+local text = "Hello from lua!\nReload test"
 
 local colors = {
     {255, 0,   0,   255}, -- red

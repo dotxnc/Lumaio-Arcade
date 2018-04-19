@@ -6,7 +6,8 @@ local commands = {
     "console_check(t) : {aaaaaaff}test output with value 't'",
     "help() : {aaaaaaff}output this help text",
     "conout(t) : {aaaaaaff}output to console with string 't'",
-    "clear() : {aaaaaaff}clear console"
+    "clear() : {aaaaaaff}clear console",
+    "arcade_reload(t) : {aaaaaaff}reload arcade entity with id 't'"
 }
 
 function string.starts(String,Start)
@@ -32,5 +33,14 @@ function _autocomplete(command)
         end
     end
     _complete(complete)
+end
+
+function arcade_reload(name)
+    local err = _reload(name)
+    if err then
+        conout("{ff5555ff}"..err)
+    else
+        conout("{55ff55ff}reloaded arcade")
+    end
 end
 

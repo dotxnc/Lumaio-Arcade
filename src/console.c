@@ -35,6 +35,27 @@ int lua_Complete(lua_State* L)
     return 0;
 }
 
+int lua_Reload(lua_State* L)
+{
+    const char* key = lua_tostring(L, 1);
+    cabinet_t* ptr = hashmap_get(world_getarcades(), key);
+    
+    if (ptr != NULL) {
+        lua_pushnil(L);
+        cabinet_reload(ptr);
+    }
+    else
+        lua_pushstring(L, "entity does not exist");
+    
+    return 1;
+}
+
+int lua_ConsoleReload(lua_State* L)
+{
+    console_reload();
+    return 0;
+}
+
 /*********
 End console lua bindings
 **********/
@@ -72,8 +93,8 @@ const char* console_call()
 //_________________________________________________________________________________//
 
 static bool isa(char a) {
-    static const char* b = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890-=!@#$%^&*()_+[]{}\\|/?.,<>`~\"':; ";
-    for (int i = 0; i < 95; i++) {
+    static const char* b = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890-=!@#$%^&*()_+[]{}\\|/?.,<>~\"':; ";
+    for (int i = 0; i < 94; i++) {
         if (b[i] == a) return true;
     }
     return false;
@@ -130,7 +151,7 @@ void console_init()
     luaL_openlibs(console_L);
     int status = 0;
     if ((status = luaL_loadfile(console_L, "assets/scripts/console.lua"))) {
-        printf("Failed to init script (%s) (%d)", lua_tostring(console_L, -1), status);
+        printf("Failed to init script (%s) (%d)\n", lua_tostring(console_L, -1), status);
     }
     
     lua_pushcfunction(console_L, lua_Conout);
@@ -141,6 +162,12 @@ void console_init()
     
     lua_pushcfunction(console_L, lua_Complete);
     lua_setglobal(console_L, "_complete");
+    
+    lua_pushcfunction(console_L, lua_Reload);
+    lua_setglobal(console_L, "_reload");
+    
+    lua_pushcfunction(console_L, lua_ConsoleReload);
+    lua_setglobal(console_L, "console_reload");
     
     // prime script
     lua_pcall(console_L, 0, 0, NULL);
@@ -156,6 +183,9 @@ void console_print(const char* s)
 
 void console_reload()
 {
+    free(console_out.data);
+    free(console_complete.data);
+    
     if (console_L)
         lua_close(console_L);
     UnloadRenderTexture(console_buffer);
@@ -171,6 +201,7 @@ void console_update()
         if (console_input_length < 128) {
             console_input[console_input_length++] = c;
         }
+        console_complete_index = -1;
         lua_getglobal(console_L, "_autocomplete");
         lua_pushstring(console_L, console_input);
         lua_pcall(console_L, 1, 0, 0);
@@ -180,17 +211,20 @@ void console_update()
         if (a) {
             console_print(FormatText("{ff0000ff}%s", lua_tostring(console_L, -1)));
         }
+        console_complete_index = -1;
         memset(console_input, '\0', 128+1);
         console_input_length = 0;
         array_clear(&console_complete);
     }
-    if (IsKeyPressed(KEY_ESCAPE)) {
+    if (IsKeyPressed(KEY_ESCAPE) || IsKeyPressed(KEY_GRAVE)) {
+        console_complete_index = -1;
         memset(console_input, '\0', 128+1);
         console_input_length = 0;
-        console_toggle();
+        // console_toggle();
         array_clear(&console_complete);
     }
     if (IsKeyPressed(KEY_BACKSPACE)) {
+        console_complete_index = -1;
         if (console_input_length > 0) {
             console_input[--console_input_length] = '\0';
             lua_getglobal(console_L, "_autocomplete");
@@ -199,6 +233,14 @@ void console_update()
             if (console_input_length == 0) {
                 array_clear(&console_complete);
             }
+        }
+    }
+    
+    if (IsKeyPressed(KEY_TAB)) {
+        if (console_complete.length > 0) {
+            console_complete_index = (console_complete_index+1)%console_complete.length;
+            strncpy(console_input, array_get(&console_complete, console_complete_index), 129);
+            console_input_length = strlen(console_input);
         }
     }
 }
@@ -227,6 +269,9 @@ void console_draw()
     
     if (console_complete.length > 0) {
         for (int i = 0; i < console_complete.length; i++) {
+            if (i == console_complete_index) {
+                DrawRectangle(10, h+35+i*15, 250, 10, GRAY);
+            }
             DrawText(array_get(&console_complete, i), 10, h+35+i*15, 10, WHITE);
         }
     }

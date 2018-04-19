@@ -137,33 +137,13 @@ static int lua_ClearColor(lua_State* L)
 End raylib lua bindings
 **********/
 
-void cabinet_init(cabinet_t* cabinet, const char* model_name, const char* script_name)
+static void cabinet_loadscript(cabinet_t* cabinet)
 {
-    char screen_name[64];
-    sprintf(screen_name, "%s_screen", model_name);
-    
-    cabinet->shader = NULL;
-    
-    cabinet->interacting = false;
-    
-    cabinet->machine = resource_getmodel(model_name);
-    cabinet->screen = resource_getmodel(screen_name);
-    
-    cabinet->position = (Vector3){0, 0, 0};
-    cabinet->rotation = MatrixIdentity();
-    
-    cabinet->target = LoadRenderTexture(512, 512);
-    cabinet->temp = LoadRenderTexture(512, 512);
-    SetTextureFilter(cabinet->target.texture, FILTER_POINT);
-    SetTextureFilter(cabinet->temp.texture, FILTER_POINT);
-    
-    cabinet->script_file = script_name;
-    
     // initialize script
     int status = 0;
     cabinet->L = luaL_newstate();
     luaL_openlibs(cabinet->L);
-    status = luaL_loadfile(cabinet->L, script_name);
+    status = luaL_loadfile(cabinet->L, cabinet->script_file);
     if (status) {
         printf("Failed to init script (%s) (%d)\n", lua_tostring(cabinet->L, -1), status);
     }
@@ -242,7 +222,39 @@ void cabinet_init(cabinet_t* cabinet, const char* model_name, const char* script
     
     // prime script
     lua_pcall(cabinet->L, 0, 0, NULL);
+}
+
+void cabinet_init(cabinet_t* cabinet, const char* model_name, const char* script_name)
+{
+    char screen_name[64];
+    sprintf(screen_name, "%s_screen", model_name);
     
+    cabinet->shader = NULL;
+    
+    cabinet->interacting = false;
+    
+    cabinet->machine = resource_getmodel(model_name);
+    cabinet->screen = resource_getmodel(screen_name);
+    
+    cabinet->position = (Vector3){0, 0, 0};
+    cabinet->rotation = MatrixIdentity();
+    
+    cabinet->target = LoadRenderTexture(512, 512);
+    cabinet->temp = LoadRenderTexture(512, 512);
+    SetTextureFilter(cabinet->target.texture, FILTER_POINT);
+    SetTextureFilter(cabinet->temp.texture, FILTER_POINT);
+    
+    cabinet->script_file = script_name;
+    
+    cabinet_reload(cabinet);
+    
+}
+
+void cabinet_reload(cabinet_t* cabinet)
+{
+    if (cabinet->L != NULL)
+        lua_close(cabinet->L);
+    cabinet_loadscript(cabinet);
 }
 
 void cabinet_rotate(cabinet_t* cabinet, float x, float y, float z)

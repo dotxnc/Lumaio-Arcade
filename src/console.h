@@ -12,12 +12,15 @@
 #include <lualib.h>
 
 #include "util/array.h"
+#include "world.h"
+#include "cabinet.h"
 
 #define CONSOLE_LENGTH 1024*(128+1) // 1024 lines. 128 length + null
 
 static bool console_open = false;
 static array_t console_out;
 static array_t console_complete;
+static int console_complete_index = -1;
 static char console_input[128+1];
 static int console_input_length = 0;
 static lua_State* console_L;
