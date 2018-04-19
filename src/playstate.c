@@ -55,6 +55,19 @@ void play_update(float dt)
         console_toggle();
     }
     
+    light_position.x = 1.5+cos(GetTime())*3;
+    light_position.z = sin(GetTime())*3;
+    
+    SetShaderValue(*lighting, light_position_location, &light_position, 3);
+    SetShaderValue(*lighting, light_viewpos_location, &camera.position, 3);
+    
+    cabinet_update(&arcade1);
+    cabinet_update(&arcade2);
+    
+    console_update();
+    
+    if (console_isopen()) return;
+    
     if (IsKeyPressed(KEY_E)) {
         // check if looking at cabinet
         
@@ -90,15 +103,6 @@ void play_update(float dt)
             SetMousePosition(save_mouse);
         }
     }
-    
-    light_position.x = 1.5+cos(GetTime())*3;
-    light_position.z = sin(GetTime())*3;
-    
-    SetShaderValue(*lighting, light_position_location, &light_position, 3);
-    SetShaderValue(*lighting, light_viewpos_location, &camera.position, 3);
-    
-    cabinet_update(&arcade1);
-    cabinet_update(&arcade2);
     
 }
 

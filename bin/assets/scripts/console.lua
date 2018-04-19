@@ -1,9 +1,36 @@
 
-Conout("console initialization stage")
+conout("{555555ff}console initialization stage")
 local i = 0
 
+local commands = {
+    "console_check(t) : {aaaaaaff}test output with value 't'",
+    "help() : {aaaaaaff}output this help text",
+    "conout(t) : {aaaaaaff}output to console with string 't'",
+    "clear() : {aaaaaaff}clear console"
+}
+
+function string.starts(String,Start)
+    return string.sub(String,1,string.len(Start))==Start
+ end
+
 function console_check(t)
-    Conout("checking... " .. i .. " : " .. t)
+    conout("checking... " .. i .. " : " .. t)
     i=i+1
+end
+
+function help()
+    for i,v in ipairs(commands) do
+        conout(v)
+    end
+end
+
+function _autocomplete(command)
+    local complete = {}
+    for key,value in pairs(_G) do
+        if (string.starts(key, command)) then
+            table.insert(complete, key)
+        end
+    end
+    _complete(complete)
 end
 

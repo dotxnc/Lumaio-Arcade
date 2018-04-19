@@ -126,6 +126,9 @@ static int lua_ClearColor(lua_State* L)
     double g = lua_tonumber(L, 2);
     double b = lua_tonumber(L, 3);
     double a = lua_tonumber(L, 4);
+    // if (lua_isnil(L, 4)) {
+    //     a = 255;
+    // }
     ClearBackground((Color){r,g,b,a});
     return 0;
 }
@@ -235,7 +238,7 @@ void cabinet_init(cabinet_t* cabinet, const char* model_name, const char* script
     lua_setglobal(cabinet->L, "arcade");
     
     lua_pushcfunction(cabinet->L, &lua_Conout);
-    lua_setglobal(cabinet->L, "Conout");
+    lua_setglobal(cabinet->L, "conout");
     
     // prime script
     lua_pcall(cabinet->L, 0, 0, NULL);
