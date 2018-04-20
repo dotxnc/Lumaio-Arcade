@@ -35,3 +35,6 @@ clean:
 
 run:
 	cd bin; ./$(OUT)
+
+dbg:
+	cd bin; gdb $(OUT)
