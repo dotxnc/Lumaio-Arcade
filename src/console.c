@@ -207,6 +207,7 @@ void console_update()
         lua_pcall(console_L, 1, 0, 0);
     }
     if (IsKeyPressed(KEY_ENTER)) {
+        console_print(FormatText("{aaaaaaff}> %s", console_input));
         int a = luaL_dostring(console_L, console_input);
         if (a) {
             console_print(FormatText("{ff0000ff}%s", lua_tostring(console_L, -1)));
@@ -236,9 +237,16 @@ void console_update()
         }
     }
     
-    if (IsKeyPressed(KEY_TAB)) {
-        if (console_complete.length > 0) {
+    if (console_complete.length > 0) {
+        if (IsKeyPressed(KEY_TAB) || IsKeyPressed(KEY_DOWN)) {
             console_complete_index = (console_complete_index+1)%console_complete.length;
+            strncpy(console_input, array_get(&console_complete, console_complete_index), 129);
+            console_input_length = strlen(console_input);
+        }
+        if (IsKeyPressed(KEY_UP)) {
+            console_complete_index--;
+            if (console_complete_index < 0)
+                console_complete_index = console_complete.length-1;
             strncpy(console_input, array_get(&console_complete, console_complete_index), 129);
             console_input_length = strlen(console_input);
         }
@@ -249,13 +257,17 @@ void console_draw()
 {
     if (!console_open) return;
     int w=console_buffer.texture.width, h=console_buffer.texture.height;
+    DrawRectangle(0, 0, w, h+30, (Color){10, 5, 0, 180});
+    
     BeginTextureMode(console_buffer);
-        DrawRectangle(0, 0, w, h, (Color){0, 0, 0, 180});
+        ClearBackground((Color){0, 0, 0, 0});
         for (int i = 0; i < console_out.length; i++) {
             Vector2 s = MeasureTextEx(GetDefaultFont(), array_get(&console_out, i), 10, 1);
-            draw_rich_text(array_get(&console_out, i), 10, h-s.y*(console_out.length-i), 10);
+            draw_rich_text(array_get(&console_out, i), 10, h-s.y*(console_out.length-i)-10, 10);
         }
     EndTextureMode();
+    
+    
     DrawLine(0, h, w, h, WHITE);
     DrawLine(0, h+30, w, h+30, WHITE);
     
