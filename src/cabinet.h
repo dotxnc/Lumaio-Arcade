@@ -35,6 +35,9 @@ typedef struct cabinet_t {
     char* script_file;
 } cabinet_t;
 
+static Matrix old_machine;
+static Matrix old_screen;
+
 void cabinet_init(cabinet_t*, const char*, const char*);
 void cabinet_reload(cabinet_t*);
 void cabinet_rotate(cabinet_t*, float, float, float);

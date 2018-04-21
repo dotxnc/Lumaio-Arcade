@@ -26,6 +26,7 @@ static int console_input_length = 0;
 static lua_State* console_L;
 static int console_num = 0;
 static Vector2 mouse_fix = {0};
+static char console_last[128+1];
 
 static RenderTexture2D console_buffer;
 

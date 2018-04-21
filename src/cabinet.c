@@ -33,7 +33,8 @@ static int lua_SetColor(lua_State* L)
     global_color.r = lua_tonumber(L, 1);
     global_color.g = lua_tonumber(L, 2);
     global_color.b = lua_tonumber(L, 3);
-    global_color.a = lua_tonumber(L, 4);
+    global_color.a = 255;
+    if (!lua_isnil(L, 4)) global_color.a = lua_tonumber(L, 4);
     return 0;
 }
 
@@ -125,11 +126,33 @@ static int lua_ClearColor(lua_State* L)
     double r = lua_tonumber(L, 1);
     double g = lua_tonumber(L, 2);
     double b = lua_tonumber(L, 3);
-    double a = lua_tonumber(L, 4);
-    // if (lua_isnil(L, 4)) {
-    //     a = 255;
-    // }
+    double a = 255;
+    if (!lua_isnil(L, 4)) a = lua_tonumber(L, 4);
     ClearBackground((Color){r,g,b,a});
+    return 0;
+}
+
+static int lua_LoadTexture(lua_State* L)
+{
+    const char* file = lua_tostring(L, 1);
+    const char* key = lua_tostring(L, 2);
+    resource_loadtexture(file, key);
+    return 0;
+}
+
+static int lua_DrawTexture(lua_State* L)
+{
+    const char* key = lua_tostring(L, 1);
+    double x = lua_tonumber(L, 2);
+    double y = lua_tonumber(L, 3);
+    double scale = 1;
+    if (!lua_isnil(L, 4)) scale = lua_tonumber(L, 4);
+    Texture2D* ptr = resource_gettexture(key);
+    if (ptr == NULL) {
+        luaL_error(L, "texture does not exist");
+    } else {
+        DrawTextureEx(*ptr, (Vector2){x, y}, 0, scale, global_color);
+    }
     return 0;
 }
 
@@ -145,7 +168,9 @@ static void cabinet_loadscript(cabinet_t* cabinet)
     luaL_openlibs(cabinet->L);
     status = luaL_loadfile(cabinet->L, cabinet->script_file);
     if (status) {
-        printf("Failed to init script (%s) (%d)\n", lua_tostring(cabinet->L, -1), status);
+        console_print(FormatText("{ff0000ff}Failed to init script (%s) (%d)", lua_tostring(cabinet->L, -1), status));
+        cabinet->errored = true;
+        return;
     }
     
     // arcade table
@@ -184,6 +209,12 @@ static void cabinet_loadscript(cabinet_t* cabinet)
     
     lua_pushcfunction(cabinet->L, &lua_ClearColor);
     lua_setfield(cabinet->L, -2, "ClearColor");
+    
+    lua_pushcfunction(cabinet->L, &lua_LoadTexture);
+    lua_setfield(cabinet->L, -2, "LoadTexture");
+    
+    lua_pushcfunction(cabinet->L, &lua_DrawTexture);
+    lua_setfield(cabinet->L, -2, "DrawTexture");
     
     // keys
     lua_pushnumber(cabinet->L, KEY_UP);
@@ -252,9 +283,16 @@ void cabinet_init(cabinet_t* cabinet, const char* model_name, const char* script
 
 void cabinet_reload(cabinet_t* cabinet)
 {
-    if (cabinet->L != NULL)
+    cabinet->errored = false;
+    
+    if (cabinet->L != NULL) {
         lua_close(cabinet->L);
+        cabinet->L = NULL;
+    }
     cabinet_loadscript(cabinet);
+    
+    lua_getglobal(cabinet->L, "init");
+    lua_pcall(cabinet->L, 0, 0, NULL);
 }
 
 void cabinet_rotate(cabinet_t* cabinet, float x, float y, float z)
@@ -273,25 +311,35 @@ void cabinet_setshader(cabinet_t* cabinet, const char* name)
 
 void cabinet_update(cabinet_t* cabinet)
 {
-    // printf("Interacting %s\n", is_interacting(cabinet->L) ? "true" : "false");
+    if (IsKeyPressed(KEY_ESCAPE)) {
+        cabinet->interacting = false;
+    }
     
-    lua_getglobal(cabinet->L, "arcade");
-    lua_pushboolean(cabinet->L, cabinet->interacting);
-    lua_setfield(cabinet->L, -2, "interacting");
-    
-    int f = lua_getglobal(cabinet->L, "update");
-    if (f > 0) {
-        lua_pushnumber(cabinet->L, GetFrameTime());
-        int s = lua_pcall(cabinet->L, 1, 0, NULL);
-        if (s > 0) {
-            printf("LUA ERROR: %s\n", lua_tostring(cabinet->L, -1));
+    if (!cabinet->errored) {
+        lua_getglobal(cabinet->L, "arcade");
+        lua_pushboolean(cabinet->L, cabinet->interacting);
+        lua_setfield(cabinet->L, -2, "interacting");
+        
+        int f = lua_getglobal(cabinet->L, "update");
+        if (f > 0) {
+            lua_pushnumber(cabinet->L, GetFrameTime());
+            int s = lua_pcall(cabinet->L, 1, 0, NULL);
+            if (s > 0) {
+                console_print(FormatText("LUA ERROR: %s", lua_tostring(cabinet->L, -1)));
+                cabinet->errored = true;
+            }
         }
     }
+    
+    Matrix m = MatrixIdentity();
+    m = MatrixMultiply(m, MatrixTranslate(cabinet->position.x, cabinet->position.y, cabinet->position.z));
+    m = MatrixMultiply(m, cabinet->rotation);
+    cabinet->machine->transform = m;
+    cabinet->screen->transform = m;
 }
 
 void cabinet_draw(cabinet_t* cabinet)
 {
-    
     cabinet->screen->material.maps[MAP_DIFFUSE].texture = cabinet->target.texture;
     
     Matrix m = MatrixIdentity();
@@ -307,11 +355,14 @@ void cabinet_draw(cabinet_t* cabinet)
 void cabinet_drawgame(cabinet_t* cabinet)
 {
     BeginTextureMode(cabinet->temp);
-        int f = lua_getglobal(cabinet->L, "draw");
-        if (f > 0) {
-            int s = lua_pcall(cabinet->L, 0, 0, NULL);
-            if (s > 0) {
-                printf("LUA ERROR: %s\n", lua_tostring(cabinet->L, -1));
+        if (!cabinet->errored) {
+            int f = lua_getglobal(cabinet->L, "draw");
+            if (f > 0) {
+                int s = lua_pcall(cabinet->L, 0, 0, NULL);
+                if (s > 0) {
+                    console_print(FormatText("LUA ERROR: %s", lua_tostring(cabinet->L, -1)));
+                    cabinet->errored = true;
+                }
             }
         }
     EndTextureMode();

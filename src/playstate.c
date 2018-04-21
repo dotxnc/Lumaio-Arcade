@@ -6,6 +6,7 @@
 
 static cabinet_t arcade1;
 static cabinet_t arcade2;
+static cabinet_t arcade3;
 static Camera camera;
 static bool interacting = false;
 static Vector2 save_mouse = (Vector2){0, 0};
@@ -37,16 +38,21 @@ void play_init()
     
     cabinet_init(&arcade1, "arcade1", "assets/scripts/games/test.lua");
     cabinet_init(&arcade2, "arcade2", "assets/scripts/games/snake.lua");
+    cabinet_init(&arcade3, "arcade2", "assets/scripts/games/space_invaders.lua");
     
     cabinet_rotate(&arcade1, 0, -0.3, 0);
     cabinet_rotate(&arcade2, 0, 0.3, 0);
+    cabinet_rotate(&arcade3, 0, 0.1, 0);
     
     cabinet_setshader(&arcade2, "vignette");
+    cabinet_setshader(&arcade3, "vignette");
     
     arcade2.position = (Vector3){3, 0, -0.75};
+    arcade3.position = (Vector3){-3, 0, -0.75};
     
     hashmap_pushvalue(world_getarcades(), "arcade1", &arcade1);
     hashmap_pushvalue(world_getarcades(), "arcade2", &arcade2);
+    hashmap_pushvalue(world_getarcades(), "arcade3", &arcade3);
     
     camera = (Camera){{0, 3.5, 5}, {0, 3, 0}, {0, 1, 0}, 90.f};
     SetCameraMode(camera, CAMERA_FIRST_PERSON);
@@ -64,36 +70,31 @@ void play_update(float dt)
     SetShaderValue(*lighting, light_position_location, &light_position, 3);
     SetShaderValue(*lighting, light_viewpos_location, &camera.position, 3);
     
-    cabinet_update(&arcade1);
-    cabinet_update(&arcade2);
+    hashmap_t* current = world_getarcades();
+    while (current != NULL) {
+        cabinet_t* ptr = current->value;
+        if (ptr != NULL) {
+            cabinet_update(ptr);
+            // interact
+            if (IsKeyPressed(KEY_E)) {
+                Ray r;
+                r.position = camera.position;
+                r.direction = Vector3Subtract(camera.target, camera.position);
+                
+                RayHitInfo h = GetCollisionRayModel(r, ptr->screen);
+                if (h.hit) {
+                    interacting = true;
+                    ptr->interacting = true;
+                    break;
+                }
+            }
+        }
+        current = current->next;
+    }
     
     console_update();
     
     if (console_isopen()) return;
-    
-    if (IsKeyPressed(KEY_E)) {
-        // check if looking at cabinet
-        
-        if (console_get("console_check")) {
-            console_pushnumber(GetTime());
-            console_call();
-        }
-        
-        Ray r;
-        r.position = camera.position;
-        r.direction = Vector3Subtract(camera.target, camera.position);
-        
-        RayHitInfo h = GetCollisionRayModel(r, arcade1.screen);
-        RayHitInfo h2 = GetCollisionRayModel(r, arcade2.screen);
-        if (h.hit) {
-            interacting = true;
-            arcade1.interacting = true;
-        }
-        if (h2.hit) {
-            interacting = true;
-            arcade2.interacting = true;
-        }
-    }
     
     if (!interacting) {
         UpdateCamera(&camera);
@@ -101,8 +102,6 @@ void play_update(float dt)
     } else {
         if (IsKeyPressed(KEY_ESCAPE)) {
             interacting = false;
-            arcade1.interacting = false;
-            arcade2.interacting = false;
             SetMousePosition(save_mouse);
         }
     }
@@ -111,35 +110,38 @@ void play_update(float dt)
 
 void play_draw()
 {
-    Ray r;
-    r.position = camera.position;
-    r.direction = Vector3Subtract(camera.target, camera.position);
-    RayHitInfo h1 = GetCollisionRayModel(r, arcade1.screen);
-    RayHitInfo h2 = GetCollisionRayModel(r, arcade2.screen);
-    
     Begin3dMode(camera);
-        // DrawGrid(100, 1);
-        
-        cabinet_draw(&arcade1);
-        cabinet_draw(&arcade2);
+        DrawGrid(1000, 1);
+        hashmap_t* current = world_getarcades();
+        while (current != NULL) {
+            cabinet_t* ptr = current->value;
+            if (ptr != NULL) {
+                cabinet_draw(ptr);
+            }
+            current = current->next;
+        }
         
         DrawSphereWires(light_position, 0.1, 6, 6, WHITE);
         
-        cabinet_drawgame(&arcade1);
-        cabinet_drawgame(&arcade2);
+        current = world_getarcades();
+        while (current != NULL) {
+            cabinet_t* ptr = current->value;
+            if (ptr != NULL) {
+                cabinet_drawgame(ptr);
+            }
+            current = current->next;
+        }
         
     End3dMode();
     
     console_draw();
-    if (h1.hit || h2.hit) {
-        DrawText("HIT", 10, 10, 20, RED);
-    }
 }
 
 void play_quit()
 {
     cabinet_free(&arcade1);
     cabinet_free(&arcade2);
+    cabinet_free(&arcade3);
 }
 
 void play_enter(gamestate_t* prev)
