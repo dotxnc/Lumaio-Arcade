@@ -254,6 +254,7 @@ void console_update()
     } else {
         if (IsKeyPressed(KEY_UP) && strlen(console_last) > 0) {
             strcpy(console_input, console_last);
+            console_input_length = strlen(console_input);
         }
     }
 }

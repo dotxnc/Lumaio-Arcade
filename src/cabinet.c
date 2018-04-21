@@ -364,6 +364,8 @@ void cabinet_drawgame(cabinet_t* cabinet)
                     cabinet->errored = true;
                 }
             }
+        } else {
+            DrawText("ERROR: CHECK CONSOLE", 256-MeasureText("ERROR: CHECK CONSOLE", 30)/2, 226, 30, (Color){255,0,0,255});
         }
     EndTextureMode();
     
