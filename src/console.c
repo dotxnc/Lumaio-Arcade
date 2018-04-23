@@ -206,7 +206,7 @@ void console_update()
         lua_pushstring(console_L, console_input);
         lua_pcall(console_L, 1, 0, 0);
     }
-    if (IsKeyPressed(KEY_ENTER)) {
+    if (IsKeyPressed(KEY_ENTER) && console_input_length > 0) {
         console_print(FormatText("{aaaaaaff}> %s", console_input));
         strcpy(console_last, console_input);
         int a = luaL_dostring(console_L, console_input);

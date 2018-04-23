@@ -50,9 +50,9 @@ void play_init()
     arcade2.position = (Vector3){3, 0, -0.75};
     arcade3.position = (Vector3){-3, 0, -0.75};
     
-    hashmap_pushvalue(world_getarcades(), "arcade1", &arcade1);
-    hashmap_pushvalue(world_getarcades(), "arcade2", &arcade2);
-    hashmap_pushvalue(world_getarcades(), "arcade3", &arcade3);
+    hashmap_pushvalue(world_getarcades(), "test", &arcade1);
+    hashmap_pushvalue(world_getarcades(), "snake", &arcade2);
+    hashmap_pushvalue(world_getarcades(), "invaders", &arcade3);
     
     camera = (Camera){{0, 3.5, 5}, {0, 3, 0}, {0, 1, 0}, 90.f};
     SetCameraMode(camera, CAMERA_FIRST_PERSON);
