@@ -9,13 +9,19 @@
 #include <raymath.h>
 #ifdef __unix__
     #include <lua5.3/lua.h>
+    #include <lua5.3/lua.h>
+    #include <lua5.3/lauxlib.h>
+    #include <lua5.3/lualib.h>
 #else
     #include <lua.h>
+    #include <lauxlib.h>
+    #include <lualib.h>
 #endif
 
 #include "resource.h"
 #include "world.h"
 #include "util/hashmap.h"
+#include "console.h"
 
 typedef struct cabinet_t {
     Model* machine;
@@ -32,7 +38,7 @@ typedef struct cabinet_t {
     bool errored;
     
     lua_State* L;
-    char* script_file;
+    char script_file[128];
 } cabinet_t;
 
 static Matrix old_machine;

@@ -12,10 +12,9 @@
 #include <lualib.h>
 
 #include "util/array.h"
+#include "util/crc32.h"
 #include "world.h"
 #include "cabinet.h"
-
-#define CONSOLE_LENGTH 1024*(128+1) // 1024 lines. 128 length + null
 
 static bool console_open = false;
 static array_t console_out;
@@ -45,7 +44,9 @@ void console_print(const char*);
 void console_reload();
 void console_update();
 void console_draw();
+void console_alt_draw();
 void console_toggle();
 bool console_isopen();
+lua_State* console_getstate();
 
 #endif

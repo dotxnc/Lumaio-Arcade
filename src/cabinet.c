@@ -1,18 +1,5 @@
 #include "cabinet.h"
 
-#include <raymath.h>
-#include "console.h"
-
-#ifdef __unix__
-    #include <lua5.3/lua.h>
-    #include <lua5.3/lauxlib.h>
-    #include <lua5.3/lualib.h>
-#else
-    #include <lua.h>
-    #include <lauxlib.h>
-    #include <lualib.h>
-#endif
-
 /*********
 These are the lua bindings to raylib draw functions
 **********/
@@ -257,8 +244,9 @@ static void cabinet_loadscript(cabinet_t* cabinet)
 
 void cabinet_init(cabinet_t* cabinet, const char* model_name, const char* script_name)
 {
-    char screen_name[64];
-    sprintf(screen_name, "%s_screen", model_name);
+    // char screen_name[64];
+    // sprintf(screen_name, "%s_screen", model_name);
+    const char* screen_name = FormatText("%s_screen", model_name);
     
     cabinet->shader = NULL;
     
@@ -275,7 +263,8 @@ void cabinet_init(cabinet_t* cabinet, const char* model_name, const char* script
     SetTextureFilter(cabinet->target.texture, FILTER_POINT);
     SetTextureFilter(cabinet->temp.texture, FILTER_POINT);
     
-    cabinet->script_file = script_name;
+    cabinet->L = NULL;
+    strcpy(cabinet->script_file, script_name);
     
     cabinet_reload(cabinet);
     

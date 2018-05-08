@@ -1,0 +1,178 @@
+[
+    {
+        "arguments": [
+            "cc",
+            "-c",
+            "-o",
+            "obj/states/editorstate.o",
+            "--std=c11",
+            "-Wno-incompatible-pointer-types",
+            "-Wno-int-conversion",
+            "-Wno-unused-value",
+            "-Isrc/",
+            "src\\states\\editorstate.c"
+        ],
+        "directory": "C:\\Users\\patri\\Desktop\\Projects\\Arcade Game",
+        "file": "src\\states\\editorstate.c"
+    },
+    {
+        "arguments": [
+            "cc",
+            "-c",
+            "-o",
+            "obj/main.o",
+            "--std=c11",
+            "-Wno-incompatible-pointer-types",
+            "-Wno-int-conversion",
+            "-Wno-unused-value",
+            "-Isrc/",
+            "src\\main.c"
+        ],
+        "directory": "C:\\Users\\patri\\Desktop\\Projects\\Arcade Game",
+        "file": "src\\main.c"
+    },
+    {
+        "arguments": [
+            "cc",
+            "-c",
+            "-o",
+            "obj/states/playstate.o",
+            "--std=c11",
+            "-Wno-incompatible-pointer-types",
+            "-Wno-int-conversion",
+            "-Wno-unused-value",
+            "-Isrc/",
+            "src\\states\\playstate.c"
+        ],
+        "directory": "C:\\Users\\patri\\Desktop\\Projects\\Arcade Game",
+        "file": "src\\states\\playstate.c"
+    },
+    {
+        "arguments": [
+            "cc",
+            "-c",
+            "-o",
+            "obj/util/hashmap.o",
+            "--std=c11",
+            "-Wno-incompatible-pointer-types",
+            "-Wno-int-conversion",
+            "-Wno-unused-value",
+            "-Isrc/",
+            "src\\util\\hashmap.c"
+        ],
+        "directory": "C:\\Users\\patri\\Desktop\\Projects\\Arcade Game",
+        "file": "src\\util\\hashmap.c"
+    },
+    {
+        "arguments": [
+            "cc",
+            "-c",
+            "-o",
+            "obj/world.o",
+            "--std=c11",
+            "-Wno-incompatible-pointer-types",
+            "-Wno-int-conversion",
+            "-Wno-unused-value",
+            "-Isrc/",
+            "src\\world.c"
+        ],
+        "directory": "C:\\Users\\patri\\Desktop\\Projects\\Arcade Game",
+        "file": "src\\world.c"
+    },
+    {
+        "arguments": [
+            "cc",
+            "-c",
+            "-o",
+            "obj/cabinet.o",
+            "--std=c11",
+            "-Wno-incompatible-pointer-types",
+            "-Wno-int-conversion",
+            "-Wno-unused-value",
+            "-Isrc/",
+            "src\\cabinet.c"
+        ],
+        "directory": "C:\\Users\\patri\\Desktop\\Projects\\Arcade Game",
+        "file": "src\\cabinet.c"
+    },
+    {
+        "arguments": [
+            "cc",
+            "-c",
+            "-o",
+            "obj/game.o",
+            "--std=c11",
+            "-Wno-incompatible-pointer-types",
+            "-Wno-int-conversion",
+            "-Wno-unused-value",
+            "-Isrc/",
+            "src\\game.c"
+        ],
+        "directory": "C:\\Users\\patri\\Desktop\\Projects\\Arcade Game",
+        "file": "src\\game.c"
+    },
+    {
+        "arguments": [
+            "cc",
+            "-c",
+            "-o",
+            "obj/resource.o",
+            "--std=c11",
+            "-Wno-incompatible-pointer-types",
+            "-Wno-int-conversion",
+            "-Wno-unused-value",
+            "-Isrc/",
+            "src\\resource.c"
+        ],
+        "directory": "C:\\Users\\patri\\Desktop\\Projects\\Arcade Game",
+        "file": "src\\resource.c"
+    },
+    {
+        "arguments": [
+            "cc",
+            "-c",
+            "-o",
+            "obj/console.o",
+            "--std=c11",
+            "-Wno-incompatible-pointer-types",
+            "-Wno-int-conversion",
+            "-Wno-unused-value",
+            "-Isrc/",
+            "src\\console.c"
+        ],
+        "directory": "C:\\Users\\patri\\Desktop\\Projects\\Arcade Game",
+        "file": "src\\console.c"
+    },
+    {
+        "arguments": [
+            "cc",
+            "-c",
+            "-o",
+            "obj/util/array.o",
+            "--std=c11",
+            "-Wno-incompatible-pointer-types",
+            "-Wno-int-conversion",
+            "-Wno-unused-value",
+            "-Isrc/",
+            "src\\util\\array.c"
+        ],
+        "directory": "C:\\Users\\patri\\Desktop\\Projects\\Arcade Game",
+        "file": "src\\util\\array.c"
+    },
+    {
+        "arguments": [
+            "cc",
+            "-c",
+            "-o",
+            "obj/util/linit.o",
+            "--std=c11",
+            "-Wno-incompatible-pointer-types",
+            "-Wno-int-conversion",
+            "-Wno-unused-value",
+            "-Isrc/",
+            "src\\util\\linit.c"
+        ],
+        "directory": "C:\\Users\\patri\\Desktop\\Projects\\Arcade Game",
+        "file": "src\\util\\linit.c"
+    }
+]

@@ -12,7 +12,8 @@ unsigned long hashmap_hash(const char* key)
 
 void hashmap_push(hashmap_t* map, const char* key, void* data, size_t size)
 {
-    unsigned long hash = hashmap_hash(key);
+    // unsigned long hash = hashmap_hash(key);
+    unsigned long hash = xcrc32((const unsigned char*)key, strlen(key), 0xffffffff);
     hashmap_t* current = map;
     while (current->next != NULL) {
         current = current->next;
@@ -27,7 +28,8 @@ void hashmap_push(hashmap_t* map, const char* key, void* data, size_t size)
 
 void hashmap_pushvalue(hashmap_t* map, const char* key, void* ptr)
 {
-    unsigned long hash = hashmap_hash(key);
+    // unsigned long hash = hashmap_hash(key);
+    unsigned long hash = xcrc32((const unsigned char*)key, strlen(key), 0xffffffff);
     hashmap_t* current = map;
     while (current->next != NULL) {
         current = current->next;
@@ -40,7 +42,8 @@ void hashmap_pushvalue(hashmap_t* map, const char* key, void* ptr)
 
 void* hashmap_get(hashmap_t* map, const char* key)
 {
-    unsigned long hash = hashmap_hash(key);
+    // unsigned long hash = hashmap_hash(key);
+    unsigned long hash = xcrc32((const unsigned char*)key, strlen(key), 0xffffffff);
     hashmap_t* current = map;
     while (current != NULL) {
         if (current->key == hash) {

@@ -56,6 +56,35 @@ int lua_ConsoleReload(lua_State* L)
     return 0;
 }
 
+int lua_CabinetSpawn(lua_State* L)
+{
+    const char* model = lua_tostring(L, 1);
+    const char* script = lua_tostring(L, 2);
+    const char* key = lua_tostring(L, 3);
+    
+    lua_settop(L, 4);
+    lua_gettable(L, 1);
+    
+    lua_rawgeti(L, 4, 1);
+    double x = lua_tonumber(L, -1);
+    lua_rawgeti(L, 4, 2);
+    double y = lua_tonumber(L, -1);
+    lua_rawgeti(L, 4, 3);
+    double z = lua_tonumber(L, -1);
+    // printf("%.2f %.2f %.2f\n", x, y, z);
+    printf("CABINET SPAWN: %s %s %s {%.2f %.2f %.2f}\n", model, script, key, x, y, z);
+    if (resource_getmodel(model) == NULL) {
+        console_print("{red}error: {white}can't find that model, aborting...");
+        return 0;
+    }
+     
+    cabinet_t* cabinet = malloc(sizeof(cabinet_t));
+    cabinet_init(cabinet, model, script);
+    cabinet->position = (Vector3){x, y, z};
+    hashmap_pushvalue(world_getarcades(), key, cabinet);
+    return 0;
+}
+
 /*********
 End console lua bindings
 **********/
@@ -102,8 +131,10 @@ static bool isa(char a) {
 
 static void draw_rich_text(const char* text, int x, int y, int size)
 {
+    // behold my masterpiece
     Color color = WHITE;
     int w = 0;
+    int h = 0;
     char l[strlen(text)+1];
     memset(l, '\0', strlen(text)+1);
     
@@ -111,28 +142,79 @@ static void draw_rich_text(const char* text, int x, int y, int size)
     {
         char c = text[i];
         if (c == '{') {
-            char hex[9] = "";
-            for (int j = 0; j < 8; j++) {
-                hex[j] = text[i+j+1];
+            bool is_color = true;
+            int b = i+1;
+            char unhashed_color[32];
+            int d = 0;
+            memset(unhashed_color, '\0', 32);
+            while (b < strlen(text) && text[b] != '}' && d < 32) {
+                unhashed_color[d++] = text[b++];
             }
-            hex[8] = '\0';
-            color = GetColor(strtoul(hex, NULL, 16));
-            i += 10;
-            if (i > strlen(text)) break;
-        } else {
-            w++;
+            unsigned int hash = xcrc32(&unhashed_color, strlen(unhashed_color), 0xffffffff);
+            switch (hash) {
+                case 2904053514: { // xcrc32(red, 3, 0xffffffff);
+                    color = (Color){255, 0, 0, 255};
+                } break;
+                case 3839832734: { // xcrc32(green, 5, 0xffffffff);
+                    color = (Color){0, 255, 0, 255};
+                } break;
+                case 1502922994: { // xcrc32(blue, 4, 0xffffffff);
+                    color = (Color){0, 0, 255, 255};
+                } break;
+                case 1110385510: { // xcrc32(yellow, 6, 0xffffffff);
+                    color = (Color){255, 255, 0, 255};
+                } break;
+                case 3774346613: { // xcrc32(cyan, 4, 0xffffffff);
+                    color = (Color){0, 255, 255, 255};
+                } break;
+                case 4006689598: { // xcrc32(purple, 6, 0xffffffff);
+                    color = (Color){255, 0, 255, 255};
+                } break;
+                case 894297704: { // xcrc32(white, 5, 0xffffffff);
+                    color = (Color){255, 255, 255, 255};
+                } break;
+                case 3058065716: { // xcrc32(black, 5, 0xffffffff);
+                    color = (Color){0, 0, 0, 255};
+                } break;
+                default: {
+                    if (unhashed_color[0] == '0' && unhashed_color[1] == 'x') {
+                        if (strlen(unhashed_color) < 10) {
+                            unhashed_color[8] = 'f';
+                            unhashed_color[9] = 'f';
+                        }
+                        color = GetColor(strtoul(unhashed_color, NULL, 0));
+                    }else {
+                        // if (strlen(unhashed_color) < 10) {
+                        //     unhashed_color[6] = 'f';
+                        //     unhashed_color[7] = 'f';
+                        // }
+                        // color = GetColor(strtoul(unhashed_color, NULL, 16));
+                        is_color = false;
+                    }
+                } break;
+            }
+            if (is_color) {
+                i = b+1;
+                c = text[i];
+            }
         }
+        if (c == '\n') {
+            memset(l, '\0', strlen(text)+1);
+            h++;
+            w=0;
+        }
+        if (c != '\n' && c != '{') w++;
         char t[2];
         sprintf(t, "%c", text[i]);
         if (w > 0 ) {
             int tw = MeasureText(l, size);
-            DrawText(t, x+tw+1, y, size, color);
-            // DrawTextEx(GetDefaultFont(), t, (Vector2){x+tw+1, y}, size, 1, color);
+            DrawText(t, x+tw+1, y+size*h+1, size, color);
         } else {
-            DrawText(t, x, y, size, color);
-            // DrawTextEx(GetDefaultFont(), t, (Vector2){x, y}, size, 1, color);
+            DrawText(t, x, y+size*h+1, size, color);
         }
-        l[strlen(l)] = text[i];
+        if (c != '\n') {
+            l[strlen(l)] = text[i];
+        }
     }
 }
 
@@ -168,6 +250,9 @@ void console_init()
     
     lua_pushcfunction(console_L, lua_ConsoleReload);
     lua_setglobal(console_L, "console_reload");
+    
+    lua_pushcfunction(console_L, lua_CabinetSpawn);
+    lua_setglobal(console_L, "cabinet_spawn");
     
     // prime script
     lua_pcall(console_L, 0, 0, NULL);
@@ -207,11 +292,11 @@ void console_update()
         lua_pcall(console_L, 1, 0, 0);
     }
     if (IsKeyPressed(KEY_ENTER) && console_input_length > 0) {
-        console_print(FormatText("{aaaaaaff}> %s", console_input));
+        console_print(FormatText("{0xaaaaaaff}> %s", console_input));
         strcpy(console_last, console_input);
         int a = luaL_dostring(console_L, console_input);
         if (a) {
-            console_print(FormatText("{ff0000ff}%s", lua_tostring(console_L, -1)));
+            console_print(FormatText("{0xff0000ff}%s", lua_tostring(console_L, -1)));
         }
         console_complete_index = -1;
         memset(console_input, '\0', 128+1);
@@ -298,6 +383,12 @@ void console_draw()
         DrawLine(270, h+30, 270, h2, WHITE);
     }
     
+    draw_rich_text("{red}This is some\n{green}rich text stuff\n{0xaa0000}and more!\n{0xffaaff}I might be slighting autistic", 50, 50, 10);
+}
+
+void console_alt_draw()
+{
+    
 }
 
 void console_toggle()
@@ -317,4 +408,9 @@ void console_toggle()
 bool console_isopen()
 {
     return console_open;
+}
+
+lua_State* console_getstate()
+{
+    return console_L;
 }

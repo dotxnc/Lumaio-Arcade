@@ -1,0 +1,25 @@
+] this file contains metadata for all the resources in the game
+] syntax:
+]       <type> <uid> <path1> <path2>
+] types:
+]       model - 3d model
+]       texture - texture image
+]       shader - combined glsl shader
+]       vshader - vertex glsl shader
+]       fshader - fragment glsl shader
+
+] models
+model arcade1 assets/models/Arcade1.obj assets/textures/Arcade1_texture.png
+model arcade2 assets/models/Arcade2.obj assets/textures/Arcade2_texture.png
+
+model arcade1_screen assets/models/Arcade1_screen.obj
+model arcade2_screen assets/models/Arcade2_screen.obj
+
+] shaders
+shader  gbuffer  assets/shaders/deferred/gbuffer.vs assets/shaders/deferred/gbuffer.fs
+
+fshader lighting assets/shaders/deferred/lighting.fs
+fshader ssao     assets/shaders/deferred/ssao.fs
+fshader blur     assets/shaders/deferred/blur.fs
+
+] textures

@@ -12,7 +12,8 @@ uniform sampler2D texture0;
 // uniform vec3 lightDirection = vec3(-1.f, 1f, -0.5f);
 uniform vec3 lightPos = vec3(1.5, 3, 2);
 // uniform vec4 diffuseLightColor = vec4(0.3f, 0.3f, 0.3f, 1.f);
-uniform vec4 diffuseLightColor = vec4(0.3f, 0.4f, 0.4f, 1.f);
+// uniform vec4 diffuseLightColor = vec4(0.3f, 0.4f, 0.4f, 1.f);
+uniform vec4 diffuseLightColor = vec4(0.f, 1.f, 0.0f, 1.f);
 uniform vec4 ambientLight = vec4(0.05f, 0.05f, 0.05f, 1.f);
 
 uniform vec3 viewPos;

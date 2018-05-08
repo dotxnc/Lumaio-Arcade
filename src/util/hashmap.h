@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "crc32.h"
 
 typedef struct hashmap_t {
     unsigned long key;

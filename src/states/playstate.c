@@ -1,8 +1,9 @@
 #include "playstate.h"
 #include <raylib.h>
-#include "resource.h"
-#include "cabinet.h"
-#include "console.h"
+#include "../resource.h"
+#include "../cabinet.h"
+#include "../console.h"
+#include "../util/raylibext.h"
 
 static cabinet_t arcade1;
 static cabinet_t arcade2;
@@ -12,29 +13,25 @@ static bool interacting = false;
 static Vector2 save_mouse = (Vector2){0, 0};
 static Vector3 light_position = (Vector3){1.5, 3, 2};
 
+static Shader* gbuffer;
 static Shader* lighting;
-static int light_position_location;
-static int light_viewpos_location;
+
+static Model ground;
 
 void play_init()
 {
     console_init();
     
-    resource_loadmodel("assets/models/Arcade1.obj", "assets/textures/Arcade1_texture.png", "arcade1");
-    resource_loadmodel("assets/models/Arcade1_screen.obj", NULL, "arcade1_screen");
+    gbuffer = resource_getshader("gbuffer");
+    gbuffer->locs[LOC_MATRIX_MODEL] = GetShaderLocation(*gbuffer, "modelMatrix");
     
-    resource_loadmodel("assets/models/Arcade2.obj", "assets/textures/Arcade2_texture.png", "arcade2");
-    resource_loadmodel("assets/models/Arcade2_screen.obj", NULL, "arcade2_screen");
+    lighting = resource_getshader("lighting");
     
-    resource_loadshader("assets/shaders/light.vs", "assets/shaders/light.fs", "simple_lighting");
-    resource_loadshader("assets/shaders/light.vs", "assets/shaders/vignette.fs", "vignette");
+    SetModelShader(resource_getmodel("arcade1"), *gbuffer);
+    SetModelShader(resource_getmodel("arcade2"), *gbuffer);
     
-    lighting = resource_getshader("simple_lighting");
-    light_position_location = GetShaderLocation(*lighting, "lightPos");
-    light_viewpos_location = GetShaderLocation(*lighting, "viewPos");
-    lighting->locs[LOC_MATRIX_MODEL] = GetShaderLocation(*lighting, "modelMatrix");
-    resource_getmodel("arcade1")->material.shader = *lighting;
-    resource_getmodel("arcade2")->material.shader = *lighting;
+    SetModelShader(resource_getmodel("arcade1_screen"), *gbuffer);
+    SetModelShader(resource_getmodel("arcade2_screen"), *gbuffer);
     
     cabinet_init(&arcade1, "arcade1", "assets/scripts/games/test.lua");
     cabinet_init(&arcade2, "arcade2", "assets/scripts/games/snake.lua");
@@ -50,6 +47,12 @@ void play_init()
     arcade2.position = (Vector3){3, 0, -0.75};
     arcade3.position = (Vector3){-3, 0, -0.75};
     
+    ground = LoadModelFromMesh(GenMeshPlane(100, 100, 5, 5));
+    ground.material.shader = *gbuffer;
+    SetModelMap(&ground, MAP_DIFFUSE, GetTextureDefault());
+    SetModelMap(&ground, MAP_SPECULAR, GetTextureDefault());
+    SetModelMap(&ground, MAP_NORMAL, GetTextureDefault());
+    
     hashmap_pushvalue(world_getarcades(), "test", &arcade1);
     hashmap_pushvalue(world_getarcades(), "snake", &arcade2);
     hashmap_pushvalue(world_getarcades(), "invaders", &arcade3);
@@ -60,15 +63,36 @@ void play_init()
 
 void play_update(float dt)
 {
+    
+    lua_State* cl = console_getstate();
+    
+    lua_newtable(cl); // CAMERA
+    
+    lua_newtable(cl); // POSITON
+        lua_pushnumber(cl, camera.position.x);
+        lua_rawseti(cl, -2, 1);
+        lua_pushnumber(cl, camera.position.y-3.5);
+        lua_rawseti(cl, -2, 2);
+        lua_pushnumber(cl, camera.position.z);
+        lua_rawseti(cl, -2, 3);
+    lua_setfield(cl, -2, "position");
+    
+    lua_newtable(cl); // TARGET
+        lua_pushnumber(cl, camera.position.x);
+        lua_rawseti(cl, -2, 1);
+        lua_pushnumber(cl, camera.position.y-3.5);
+        lua_rawseti(cl, -2, 2);
+        lua_pushnumber(cl, camera.position.z);
+        lua_rawseti(cl, -2, 3);
+    lua_setfield(cl, -2, "target");
+    
+    lua_setglobal(cl, "camera");
+    
+    SetShaderVector3(*lighting, "viewpos", camera.position);
+    
     if (IsKeyPressed(KEY_GRAVE)) {
         console_toggle();
     }
-    
-    light_position.x = 1.5+cos(GetTime())*3;
-    light_position.z = sin(GetTime())*3;
-    
-    SetShaderValue(*lighting, light_position_location, &light_position, 3);
-    SetShaderValue(*lighting, light_viewpos_location, &camera.position, 3);
     
     hashmap_t* current = world_getarcades();
     while (current != NULL) {
@@ -111,7 +135,7 @@ void play_update(float dt)
 void play_draw()
 {
     Begin3dMode(camera);
-        DrawGrid(1000, 1);
+        DrawModel(ground, Vector3Zero(), 1, WHITE);
         hashmap_t* current = world_getarcades();
         while (current != NULL) {
             cabinet_t* ptr = current->value;
@@ -121,20 +145,28 @@ void play_draw()
             current = current->next;
         }
         
-        DrawSphereWires(light_position, 0.1, 6, 6, WHITE);
-        
-        current = world_getarcades();
-        while (current != NULL) {
-            cabinet_t* ptr = current->value;
-            if (ptr != NULL) {
-                cabinet_drawgame(ptr);
-            }
-            current = current->next;
-        }
+        DrawSphereWires((Vector3){0, 3, 1.5}, 0.1, 10, 10, WHITE);
         
     End3dMode();
     
+}
+
+void play_alt_draw()
+{
+    hashmap_t* current = world_getarcades();
+    while (current != NULL) {
+        cabinet_t* ptr = current->value;
+        if (ptr != NULL) {
+            cabinet_drawgame(ptr);
+        }
+        current = current->next;
+    }
+}
+
+void play_ui_draw()
+{
     console_draw();
+    console_alt_draw();
 }
 
 void play_quit()
@@ -158,13 +190,15 @@ static gamestate_t play_state;
 gamestate_t* play_getstate() {
     static bool i = false;
     if (!i) {
-        play_state.initialized = false;
-        play_state.game_init   = &play_init;
-        play_state.game_update = &play_update;
-        play_state.game_draw   = &play_draw;
-        play_state.game_quit   = &play_quit;
-        play_state.game_leave  = &play_leave;
-        play_state.game_enter  = &play_enter;
+        play_state.initialized   = false;
+        play_state.game_init     = &play_init;
+        play_state.game_update   = &play_update;
+        play_state.game_draw     = &play_draw;
+        play_state.game_alt_draw = &play_alt_draw;
+        play_state.game_ui_draw  = &play_ui_draw;
+        play_state.game_quit     = &play_quit;
+        play_state.game_leave    = &play_leave;
+        play_state.game_enter    = &play_enter;
         i = true;
     }
     return &play_state;

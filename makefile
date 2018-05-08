@@ -7,15 +7,15 @@ OUT =
 
 LDFLAGS = -Wl,-allow-multiple-definition -static-libgcc
 LIBS = 
-CC = 
+comp = ${CC}
 ifeq ($(OS),Windows_NT)
 	OUT = $(NAME).exe
-	CC += clang
+	# CC += clang
 	LDFLAGS += -static
 	LIBS = -lraylib -lopengl32 -lgdi32 -llua
 else
 	OUT = $(NAME)
-	CC += clang
+	# CC += clang
 	LIBS = -lraylib -lGL -lXxf86vm -lXext -lX11 -lXrandr -lXinerama -lXcursor -llua5.3 -lm -lpthread -ldl
 endif
 
@@ -23,11 +23,11 @@ all: $(OUT)
 
 $(OUT): $(OBJ)
 	@ test -d bin || mkdir bin
-	$(CC) -o bin/$(OUT) $(CFLAGS) $(OBJ) $(LIBS) $(LDFLAGS)
+	$(comp) -o bin/$(OUT) $(CFLAGS) $(OBJ) $(LIBS) $(LDFLAGS)
 
 obj/%.o: src/%.c
 	@ test -d $(@D) || mkdir $(@D)
-	$(CC) -c $< -o $@ $(CFLAGS)
+	$(comp) -c $< -o $@ $(CFLAGS)
 
 clean:
 	rm -r obj/*
