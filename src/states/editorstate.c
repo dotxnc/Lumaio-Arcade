@@ -6,7 +6,7 @@
 #include "../world.h"
 #include "../util/array.h"
 
-static Camera camera;
+static Camera3D camera;
 static array_t cubes;
 
 static void camera_free()
@@ -60,7 +60,7 @@ static void camera_free()
 void editor_init()
 {
     camera = (Camera){{0, 3, 0}, {0, 0, 0}, {0, 1, 0}, 90.f};
-    SetCameraMode(camera, CAMERA_FREE);
+    // SetCameraMode(camera, CAMERA_FREE);
 }
 
 Vector2 mouse_old;
@@ -75,11 +75,21 @@ void editor_update(float dt)
 
 void editor_draw()
 {
-    Begin3dMode(camera);
+    BeginMode3D(camera);
         DrawGrid(100, 1);
-    End3dMode();
+    EndMode3D();
     
     DrawText("Editor state", 10, 10, 40, GREEN);
+}
+
+void editor_alt_draw()
+{
+    
+}
+
+void editor_ui_draw()
+{
+    
 }
 
 void editor_quit()
@@ -106,6 +116,8 @@ gamestate_t* editor_getstate()
         editor_state.game_init   = &editor_init;
         editor_state.game_update = &editor_update;
         editor_state.game_draw   = &editor_draw;
+        editor_state.game_alt_draw   = &editor_alt_draw;
+        editor_state.game_ui_draw   = &editor_ui_draw;
         editor_state.game_quit   = &editor_quit;
         editor_state.game_leave  = &editor_leave;
         editor_state.game_enter  = &editor_enter;

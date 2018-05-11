@@ -11,6 +11,8 @@ uniform sampler2D normalbuffer;
 uniform sampler2D positionbuffer;
 uniform sampler2D ssaobuffer;
 
+uniform mat4 camView;
+
 struct light {
     vec3 position;
     vec3 color;
@@ -24,13 +26,17 @@ uniform vec3 viewpos;
 
 vec3 calc_lighting()
 {
-    vec3 Normal = texture(normalbuffer, fragTexCoord).rgb;
+    vec3 Normal = normalize(texture(normalbuffer, fragTexCoord).rgb);
+    Normal = normalize((inverse(camView) * vec4(Normal, 0.f))).xyz;
+    
     vec3 FragPos = texture(positionbuffer, fragTexCoord).rgb;
+    FragPos = (inverse(camView) * vec4(FragPos, 1.f)).xyz;
+    
     vec3 Diffuse = texture(colorbuffer, fragTexCoord).rgb;
     float Specular = texture(colorbuffer, fragTexCoord).a;
     
-    vec3 lighting = Diffuse * 0.1;
-    vec3 viewdir = normalize(viewpos - FragPos);
+    vec3 lighting = Diffuse * 0.1 * texture(ssaobuffer, fragTexCoord).rgb;
+    vec3 viewdir = normalize(viewpos-FragPos);
     for (int i = 0; i < num_lights; i++) {
         vec3 lightdir = normalize(lights[i].position - FragPos);
         vec3 diffuse = max(dot(Normal, lightdir), 0.0) * Diffuse * lights[i].color;
@@ -45,7 +51,7 @@ vec3 calc_lighting()
         specular *= attenuation;
         lighting += diffuse + specular;
     }
-    lighting *= texture(ssaobuffer, fragTexCoord).rgb;
+    // lighting *= texture(ssaobuffer, fragTexCoord).rgb;
     
     return lighting;
     

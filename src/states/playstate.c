@@ -8,7 +8,7 @@
 static cabinet_t arcade1;
 static cabinet_t arcade2;
 static cabinet_t arcade3;
-static Camera camera;
+static Camera camera = { 0 };
 static bool interacting = false;
 static Vector2 save_mouse = (Vector2){0, 0};
 static Vector3 light_position = (Vector3){1.5, 3, 2};
@@ -17,6 +17,7 @@ static Shader* gbuffer;
 static Shader* lighting;
 
 static Model ground;
+static Model world_model;
 
 void play_init()
 {
@@ -24,6 +25,8 @@ void play_init()
     
     gbuffer = resource_getshader("gbuffer");
     gbuffer->locs[LOC_MATRIX_MODEL] = GetShaderLocation(*gbuffer, "modelMatrix");
+    gbuffer->locs[LOC_MATRIX_VIEW] = GetShaderLocation(*gbuffer, "viewMatrix");
+    gbuffer->locs[LOC_MATRIX_PROJECTION] = GetShaderLocation(*gbuffer, "projectionMatrix");
     
     lighting = resource_getshader("lighting");
     
@@ -41,8 +44,8 @@ void play_init()
     cabinet_rotate(&arcade2, 0, 0.3, 0);
     cabinet_rotate(&arcade3, 0, 0.1, 0);
     
-    cabinet_setshader(&arcade2, "vignette");
-    cabinet_setshader(&arcade3, "vignette");
+    // cabinet_setshader(&arcade2, "vignette");
+    // cabinet_setshader(&arcade3, "vignette");
     
     arcade2.position = (Vector3){3, 0, -0.75};
     arcade3.position = (Vector3){-3, 0, -0.75};
@@ -53,11 +56,22 @@ void play_init()
     SetModelMap(&ground, MAP_SPECULAR, GetTextureDefault());
     SetModelMap(&ground, MAP_NORMAL, GetTextureDefault());
     
+    world_model = LoadModel("assets/models/test_map.obj");
+    world_model.material.shader = *gbuffer;
+    SetModelMap(&world_model, MAP_DIFFUSE, GetTextureDefault());
+    SetModelMap(&world_model, MAP_SPECULAR, GetTextureDefault());
+    SetModelMap(&world_model, MAP_NORMAL, GetTextureDefault());
+    
     hashmap_pushvalue(world_getarcades(), "test", &arcade1);
     hashmap_pushvalue(world_getarcades(), "snake", &arcade2);
-    hashmap_pushvalue(world_getarcades(), "invaders", &arcade3);
+    // hashmap_pushvalue(world_getarcades(), "invaders", &arcade3);
     
-    camera = (Camera){{0, 3.5, 5}, {0, 3, 0}, {0, 1, 0}, 90.f};
+    // Camera camera = { 0 };
+    camera.position = (Vector3){ 0.f, 3.5f, 1.f };
+    camera.target = (Vector3){ 0.0f, 1.8f, 0.0f };
+    camera.up = (Vector3){ 0.0f, 1.0f, 0.0f };
+    camera.fovy = 90.0f;
+    camera.type = CAMERA_PERSPECTIVE;
     SetCameraMode(camera, CAMERA_FIRST_PERSON);
 }
 
@@ -129,13 +143,14 @@ void play_update(float dt)
             SetMousePosition(save_mouse);
         }
     }
+    game_setcamera(camera);
     
 }
 
 void play_draw()
 {
-    Begin3dMode(camera);
-        DrawModel(ground, Vector3Zero(), 1, WHITE);
+    BeginMode3D(camera);
+        DrawModel(world_model, Vector3Zero(), 1, WHITE);
         hashmap_t* current = world_getarcades();
         while (current != NULL) {
             cabinet_t* ptr = current->value;
@@ -146,8 +161,9 @@ void play_draw()
         }
         
         DrawSphereWires((Vector3){0, 3, 1.5}, 0.1, 10, 10, WHITE);
-        
-    End3dMode();
+        DrawSphereWires((Vector3){-3, 3, 1.5}, 0.1, 10, 10, WHITE);
+        DrawSphereWires((Vector3){3, 3, 1.5}, 0.1, 10, 10, WHITE);
+    EndMode3D();
     
 }
 

@@ -2,6 +2,7 @@
 #define GAME_H
 
 #include <stdbool.h>
+#include <raylib.h>
 
 struct game_t;
 struct gamestate_t;
@@ -40,6 +41,7 @@ typedef struct game_t {
 void game_init(game_t*, int, int, void*);
 void game_setstate(game_t*, gamestate_t*);
 void game_start(game_t*);
+void game_setcamera(Camera3D);
 void game_shutdown(game_t*);
 
 #endif

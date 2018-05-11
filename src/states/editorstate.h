@@ -6,6 +6,8 @@
 void editor_init();
 void editor_update(float);
 void editor_draw();
+void editor_alt_draw();
+void editor_ui_draw();
 void editor_quit();
 void editor_enter(gamestate_t*);
 void editor_leave(gamestate_t*);

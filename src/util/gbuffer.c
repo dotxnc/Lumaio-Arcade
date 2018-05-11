@@ -23,20 +23,14 @@ void gbuffer_init(gbuffer_t* gbuffer, int width, int height)
     gbuffer->normal.id = 0;
     gbuffer->normal.width = width;
     gbuffer->normal.height = height;
-    gbuffer->normal.format = UNCOMPRESSED_R8G8B8A8;
+    gbuffer->normal.format = UNCOMPRESSED_R8G8B8;
     gbuffer->normal.mipmaps = 0;
     
     gbuffer->position.id = 0;
     gbuffer->position.width = width;
     gbuffer->position.height = height;
-    gbuffer->position.format = UNCOMPRESSED_R8G8B8A8;
+    gbuffer->position.format = UNCOMPRESSED_R8G8B8;
     gbuffer->position.mipmaps = 0;
-    
-    gbuffer->emission.id = 0;
-    gbuffer->emission.width = width;
-    gbuffer->emission.height = height;
-    gbuffer->emission.format = UNCOMPRESSED_R8G8B8A8;
-    gbuffer->emission.mipmaps = 0;
     
     glGenFramebuffers(1, &gbuffer->id);
     glBindFramebuffer(GL_FRAMEBUFFER, gbuffer->id);
@@ -46,6 +40,8 @@ void gbuffer_init(gbuffer_t* gbuffer, int width, int height)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gbuffer->position.id, 0);
     
     glGenTextures(1, &gbuffer->normal.id);
