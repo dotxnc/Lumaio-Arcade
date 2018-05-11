@@ -1,6 +1,7 @@
 #ifndef RAYLIBEXT_H
 #define RAYLIBEXT_H
 
+#include <stdio.h>
 #include <raylib.h>
 #include <raymath.h>
 #include "glad.h"
@@ -68,6 +69,26 @@ void SetShaderInt(Shader s, const char*n, int i)
 void DrawTextureFlipped(Texture2D t)
 {
     DrawTexturePro(t, (Rectangle){0, 0, t.width, -t.height}, (Rectangle){0, 0, t.width, t.height}, Vector2Zero(), 0.f, WHITE);
+}
+
+static bool init = false;
+static Texture2D texture;
+Texture2D GetTransparentTexture()
+{
+    if (!init) {
+        Vector4 c[4*4] = {0};
+        glGenTextures(1, &texture.id);
+        glBindTexture(GL_TEXTURE_2D, texture.id);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 4, 4, 0, GL_RGBA, GL_FLOAT, &c[0]);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        init = true;
+        printf("\t\ttransparent texture initialized\n");
+    }
+    return texture;
 }
 
 #endif

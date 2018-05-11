@@ -32,6 +32,12 @@ void gbuffer_init(gbuffer_t* gbuffer, int width, int height)
     gbuffer->position.format = UNCOMPRESSED_R8G8B8;
     gbuffer->position.mipmaps = 0;
     
+    gbuffer->emission.id = 0;
+    gbuffer->emission.width = width;
+    gbuffer->emission.height = height;
+    gbuffer->emission.format = UNCOMPRESSED_R8G8B8A8;
+    gbuffer->emission.mipmaps = 0;
+    
     glGenFramebuffers(1, &gbuffer->id);
     glBindFramebuffer(GL_FRAMEBUFFER, gbuffer->id);
     
@@ -58,8 +64,15 @@ void gbuffer_init(gbuffer_t* gbuffer, int width, int height)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, gbuffer->color.id, 0);
     
-    unsigned int buffers[3] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2};
-    glDrawBuffers(3, buffers);
+    glGenTextures(1, &gbuffer->emission.id);
+    glBindTexture(GL_TEXTURE_2D, gbuffer->emission.id);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, gbuffer->emission.id, 0);
+    
+    unsigned int buffers[4] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3};
+    glDrawBuffers(4, buffers);
     
     glGenTextures(1, &gbuffer->depth.id);
     glBindTexture(GL_TEXTURE_2D, gbuffer->depth.id);

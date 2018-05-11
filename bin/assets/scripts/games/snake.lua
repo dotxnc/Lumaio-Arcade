@@ -23,7 +23,7 @@ local green = {0, 255, 0, 255}
 
 function initialize_snake()
     -- print("initializing snake...")
-    conout("{00ffffff}[SNAKE] {ffffffff}initializing...")
+    conout("{0x00ffff}[SNAKE] {white}initializing...")
     
     dead = false
     elapsed = 0
@@ -190,7 +190,6 @@ function update(dt)
 end
 
 function draw()
-    -- arcade.ClearColor(25, 25, 25, 255)
     arcade.SetColor(25, 25, 25, 255)
     arcade.DrawRectangle("fill", 0, 0, arcade.width, arcade.height)
     

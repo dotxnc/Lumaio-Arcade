@@ -1,13 +1,13 @@
 
-conout("{555555ff}console initialization stage")
+conout("{0x555555}console initialization stage")
 local i = 0
 
 local commands = {
-    "console_check(t) : {aaaaaaff}test output with value 't'",
-    "help() : {aaaaaaff}output this help text",
-    "conout(t) : {aaaaaaff}output to console with string 't'",
-    "clear() : {aaaaaaff}clear console",
-    "arcade_reload(t) : {aaaaaaff}reload arcade entity with id 't'"
+    "console_check(t) : {0xaaaaaa}test output with value 't'",
+    "help() : {0xaaaaaa}output this help text",
+    "conout(t) : {0xaaaaaa}output to console with string 't'",
+    "clear() : {0xaaaaaa}clear console",
+    "arcade_reload(t) : {0xaaaaaa}reload arcade entity with id 't'"
 }
 
 function string.starts(String,Start)
@@ -38,9 +38,9 @@ end
 function arcade_reload(name)
     local err = _reload(name)
     if err then
-        conout("{ff5555ff}"..err)
+        conout("{0xff5555}"..err)
     else
-        conout("{55ff55ff}reloaded arcade")
+        conout("{0x55ff55}reloaded arcade")
     end
 end
 

@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "util/raylibext.h"
 
 #define MAX_ID 32
 #define MAX_SHADERS 32

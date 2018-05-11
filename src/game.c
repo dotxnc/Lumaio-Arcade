@@ -12,11 +12,14 @@ static gbuffer_t gbuffer;
 static Shader lighting;
 static Shader ssao;
 static Shader blur;
+static Shader emission;
 
 static RenderTexture2D ssao_buffer;
 static RenderTexture2D blur_buffer;
 static RenderTexture2D color_buffer;
 static Matrix camera_matrix;
+
+static bool debug_draw = false;
 
 static unsigned int noise;
 
@@ -60,6 +63,9 @@ void game_init(game_t *game, int width, int height, void *title) {
     blur = *resource_getshader("blur");
     BindShaderTexture(blur, "ssaobuffer", 1);
     
+    emission = *resource_getshader("emission");
+    BindShaderTexture(emission, "ssaobuffer", 1);
+    
     SetShaderVector3(lighting, "lights[0].position", (Vector3){0, 3, 1.5});
     SetShaderVector3(lighting, "lights[0].color",    (Vector3){0, 1, 1});
     SetShaderFloat(lighting, "lights[0].linear",   0.9);
@@ -74,6 +80,11 @@ void game_init(game_t *game, int width, int height, void *title) {
     SetShaderVector3(lighting, "lights[2].color",    (Vector3){0, 1, 1});
     SetShaderFloat(lighting, "lights[2].linear",   0.7);
     SetShaderFloat(lighting, "lights[2].quadratic",1.8);
+    
+    SetShaderVector3(lighting, "lights[3].position", (Vector3){0, 3, -3.4});
+    SetShaderVector3(lighting, "lights[3].color",    (Vector3){1, 1, 1});
+    SetShaderFloat(lighting, "lights[3].linear",   0.7);
+    SetShaderFloat(lighting, "lights[3].quadratic",1.8);
     
     gbuffer = gbuffer_new(1280, 720);
     
@@ -133,6 +144,8 @@ void game_start(game_t *game) {
     
     while (!WindowShouldClose()) {
         game->gamestate->game_update(GetFrameTime());
+        if (IsKeyPressed(KEY_F5))
+            debug_draw = !debug_draw;
         
         BeginDrawing();
             ClearBackground(BLACK);
@@ -164,11 +177,18 @@ void game_start(game_t *game) {
                 SetShaderTexture(blur_buffer.texture, 4);
                 DrawTextureFlipped(color_buffer.texture);
             EndShaderMode();
-            // DrawTextureFlipped(ssao_buffer.texture);
-            DrawTexturePro(ssao_buffer.texture, (Rectangle){0, 0, 1280, -720}, (Rectangle){0, 0, 1280/4, 720/4}, Vector2Zero(), 0, WHITE);
-            DrawTexturePro(gbuffer.normal, (Rectangle){0, 0, 1280, -720}, (Rectangle){0, 720/4, 1280/4, 720/4}, Vector2Zero(), 0, WHITE);
-            DrawTexturePro(gbuffer.position, (Rectangle){0, 0, 1280, -720}, (Rectangle){0, 720/4*2, 1280/4, 720/4}, Vector2Zero(), 0, WHITE);
-            DrawTexturePro(gbuffer.color, (Rectangle){0, 0, 1280, -720}, (Rectangle){0, 720/4*3, 1280/4, 720/4}, Vector2Zero(), 0, WHITE);
+            
+            BeginShaderMode(emission);
+                SetShaderTexture(blur_buffer.texture, 1);
+                DrawTextureFlipped(gbuffer.emission);
+            EndShaderMode();
+            
+            if (debug_draw) {
+                DrawTexturePro(ssao_buffer.texture, (Rectangle){0, 0, 1280, -720}, (Rectangle){0, 0, 1280/4, 720/4}, Vector2Zero(), 0, WHITE);
+                DrawTexturePro(gbuffer.normal, (Rectangle){0, 0, 1280, -720}, (Rectangle){0, 720/4, 1280/4, 720/4}, Vector2Zero(), 0, WHITE);
+                DrawTexturePro(gbuffer.position, (Rectangle){0, 0, 1280, -720}, (Rectangle){0, 720/4*2, 1280/4, 720/4}, Vector2Zero(), 0, WHITE);
+                DrawTexturePro(gbuffer.emission, (Rectangle){0, 0, 1280, -720}, (Rectangle){0, 720/4*3, 1280/4, 720/4}, Vector2Zero(), 0, WHITE);
+            }
             
             game->gamestate->game_ui_draw();
         EndDrawing();

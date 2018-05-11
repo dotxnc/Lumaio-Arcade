@@ -14,7 +14,7 @@ local colors = {
 }
 
 function init()
-    conout("{00ffffff}[TEST] {ffffffff}test script init")
+    conout("{0x00ffff}[TEST] {white}test script init")
     arcade.LoadTexture("assets/textures/Arcade1_texture.png", "Arcade1_texture")
 end
 
@@ -23,6 +23,9 @@ function update(dt)
 end
 
 function draw()
+    arcade.SetColor(25, 25, 25, 255)
+    arcade.DrawRectangle("fill", 0, 0, arcade.width, arcade.height)
+    
     arcade.SetColor(255, 255, 255, 255)
     arcade.DrawText("Interacting: " .. tostring(arcade.interacting), 10, 10, 20)
     arcade.DrawText("KEY_X      : " .. tostring(arcade.IsKeyDown(arcade.KEY_X)), 10, 30, 20)

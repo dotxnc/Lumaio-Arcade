@@ -2,6 +2,7 @@
 layout (location = 0) out vec3 gposition;
 layout (location = 1) out vec3 gnormal;
 layout (location = 2) out vec4 galbedospec;
+layout (location = 3) out vec4 gemission;
 
 in vec2 fragTexCoord;
 in vec3 fragPos;
@@ -10,6 +11,9 @@ in vec3 fragNormal;
 uniform sampler2D texture0; // diffuse
 uniform sampler2D texture1; // specular
 uniform sampler2D texture2; // normals
+uniform sampler2D texture3; // roughness
+uniform sampler2D texture4; // occlusion
+uniform sampler2D texture5; // emission
 
 out vec4 finalColor;
 
@@ -23,8 +27,10 @@ void main()
 {
     gnormal = normalize(fragNormal);
     gposition = fragPos;
-    // gposition.z = gl_FragCoord.z;
-    // gposition.z = linearize_depth(gl_FragCoord.z, 0.01, 1000.0);
     galbedospec.rgb = texture(texture0, fragTexCoord).rgb;
     galbedospec.a = texture(texture1, fragTexCoord).r;
+    
+    vec4 em = texture(texture5, fragTexCoord);
+    gemission.rgba = em.rgba;
+    
 }

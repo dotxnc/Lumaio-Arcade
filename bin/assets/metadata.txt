@@ -21,5 +21,6 @@ shader  gbuffer  assets/shaders/deferred/gbuffer.vs assets/shaders/deferred/gbuf
 fshader lighting assets/shaders/deferred/lighting.fs
 fshader ssao     assets/shaders/deferred/ssao.fs
 fshader blur     assets/shaders/deferred/blur.fs
+fshader emission assets/shaders/deferred/emission.fs
 
 ] textures

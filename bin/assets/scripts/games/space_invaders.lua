@@ -59,7 +59,7 @@ local wave = 1
 local lives = 3
 
 function init()
-    conout("{00ffffff}[INVADERS] {ffffffff}initializing...")
+    conout("{0x00ffff}[INVADERS] {white}initializing...")
     
     math.randomseed(arcade.GetTime())
     
@@ -271,7 +271,7 @@ function draw()
     ::int::
     if not arcade.interacting then
         local w1 = arcade.GetTextWidth("PAUSED", 40)
-        SetColor(0, 0, 0, 255)
+        SetColor(10, 10, 10, 255)
         DrawRectangle("fill", arcade.width/2-w1/2-10, arcade.height/2-50, w1+20, 60)
         SetColor(255, 255, 255, 255)
         DrawText("PAUSED", arcade.width/2-w1/2, arcade.height/2-40, 40)

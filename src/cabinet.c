@@ -329,7 +329,8 @@ void cabinet_update(cabinet_t* cabinet)
 
 void cabinet_draw(cabinet_t* cabinet)
 {
-    cabinet->screen->material.maps[MAP_DIFFUSE].texture = cabinet->target.texture;
+    cabinet->screen->material.maps[MAP_DIFFUSE].texture = cabinet->target.texture;//cabinet->target.texture;
+    cabinet->screen->material.maps[MAP_EMISSION].texture = cabinet->target.texture;
     
     Matrix m = MatrixIdentity();
     m = MatrixMultiply(m, MatrixTranslate(cabinet->position.x, cabinet->position.y, cabinet->position.z));

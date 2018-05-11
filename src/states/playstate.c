@@ -8,6 +8,7 @@
 static cabinet_t arcade1;
 static cabinet_t arcade2;
 static cabinet_t arcade3;
+static cabinet_t arcade4;
 static Camera camera = { 0 };
 static bool interacting = false;
 static Vector2 save_mouse = (Vector2){0, 0};
@@ -27,6 +28,7 @@ void play_init()
     gbuffer->locs[LOC_MATRIX_MODEL] = GetShaderLocation(*gbuffer, "modelMatrix");
     gbuffer->locs[LOC_MATRIX_VIEW] = GetShaderLocation(*gbuffer, "viewMatrix");
     gbuffer->locs[LOC_MATRIX_PROJECTION] = GetShaderLocation(*gbuffer, "projectionMatrix");
+    gbuffer->locs[LOC_MAP_EMISSION] = GetShaderLocation(*gbuffer, "texture5");
     
     lighting = resource_getshader("lighting");
     
@@ -39,16 +41,19 @@ void play_init()
     cabinet_init(&arcade1, "arcade1", "assets/scripts/games/test.lua");
     cabinet_init(&arcade2, "arcade2", "assets/scripts/games/snake.lua");
     cabinet_init(&arcade3, "arcade2", "assets/scripts/games/space_invaders.lua");
+    cabinet_init(&arcade4, "arcade2", "assets/scripts/games/snake2.lua");
     
     cabinet_rotate(&arcade1, 0, -0.3, 0);
     cabinet_rotate(&arcade2, 0, 0.3, 0);
     cabinet_rotate(&arcade3, 0, 0.1, 0);
+    cabinet_rotate(&arcade4, 0, 0.1, 0);
     
     // cabinet_setshader(&arcade2, "vignette");
     // cabinet_setshader(&arcade3, "vignette");
     
     arcade2.position = (Vector3){3, 0, -0.75};
     arcade3.position = (Vector3){-3, 0, -0.75};
+    arcade4.position = (Vector3){-1, 0, -5};
     
     ground = LoadModelFromMesh(GenMeshPlane(100, 100, 5, 5));
     ground.material.shader = *gbuffer;
@@ -61,10 +66,12 @@ void play_init()
     SetModelMap(&world_model, MAP_DIFFUSE, GetTextureDefault());
     SetModelMap(&world_model, MAP_SPECULAR, GetTextureDefault());
     SetModelMap(&world_model, MAP_NORMAL, GetTextureDefault());
+    SetModelMap(&world_model, MAP_EMISSION, GetTransparentTexture());
     
     hashmap_pushvalue(world_getarcades(), "test", &arcade1);
     hashmap_pushvalue(world_getarcades(), "snake", &arcade2);
-    // hashmap_pushvalue(world_getarcades(), "invaders", &arcade3);
+    hashmap_pushvalue(world_getarcades(), "invaders", &arcade3);
+    hashmap_pushvalue(world_getarcades(), "snake2", &arcade4);
     
     // Camera camera = { 0 };
     camera.position = (Vector3){ 0.f, 3.5f, 1.f };

@@ -63,9 +63,12 @@ bool resource_loadmodel(const char* model_file, const char* texture_file, const 
     resource_manager.models[resource_manager.num_models].model = LoadModel(model_file);
     if (texture_file != NULL) {
         resource_manager.models[resource_manager.num_models].model.material.maps[MAP_DIFFUSE].texture = LoadTexture(texture_file);
-        resource_manager.models[resource_manager.num_models].model.material.maps[MAP_SPECULAR].texture = GetTextureDefault();
-        resource_manager.models[resource_manager.num_models].model.material.maps[MAP_NORMAL].texture = GetTextureDefault();
+    } else {
+        resource_manager.models[resource_manager.num_models].model.material.maps[MAP_DIFFUSE].texture = GetTextureDefault();
     }
+    resource_manager.models[resource_manager.num_models].model.material.maps[MAP_SPECULAR].texture = GetTextureDefault();
+    resource_manager.models[resource_manager.num_models].model.material.maps[MAP_NORMAL].texture = GetTextureDefault();
+    resource_manager.models[resource_manager.num_models].model.material.maps[MAP_EMISSION].texture = GetTransparentTexture();
     strcpy(resource_manager.models[resource_manager.num_models].ID, ID);
     resource_manager.num_models++;
     return true;

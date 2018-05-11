@@ -35,7 +35,7 @@ vec3 calc_lighting()
     vec3 Diffuse = texture(colorbuffer, fragTexCoord).rgb;
     float Specular = texture(colorbuffer, fragTexCoord).a;
     
-    vec3 lighting = Diffuse * 0.1 * texture(ssaobuffer, fragTexCoord).rgb;
+    vec3 lighting = Diffuse * 0.1;// * texture(ssaobuffer, fragTexCoord).rgb;
     vec3 viewdir = normalize(viewpos-FragPos);
     for (int i = 0; i < num_lights; i++) {
         vec3 lightdir = normalize(lights[i].position - FragPos);
@@ -51,7 +51,7 @@ vec3 calc_lighting()
         specular *= attenuation;
         lighting += diffuse + specular;
     }
-    // lighting *= texture(ssaobuffer, fragTexCoord).rgb;
+    lighting *= texture(ssaobuffer, fragTexCoord).rgb;
     
     return lighting;
     
