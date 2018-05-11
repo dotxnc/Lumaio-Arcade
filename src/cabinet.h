@@ -39,6 +39,8 @@ typedef struct cabinet_t {
     
     lua_State* L;
     char script_file[128];
+    
+    unsigned int hash;
 } cabinet_t;
 
 static Matrix old_machine;

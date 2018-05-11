@@ -282,6 +282,12 @@ void cabinet_reload(cabinet_t* cabinet)
     
     lua_getglobal(cabinet->L, "init");
     lua_pcall(cabinet->L, 0, 0, NULL);
+    
+    const char* text = LoadText(cabinet->script_file);
+    cabinet->hash = xcrc32((const unsigned char*)text, strlen(text), 0xffffffff);
+    
+    printf("\t\tHASH FOR %s IS %u\n", cabinet->script_file, cabinet->hash);
+    
 }
 
 void cabinet_rotate(cabinet_t* cabinet, float x, float y, float z)
