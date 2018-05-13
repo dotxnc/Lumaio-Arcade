@@ -155,9 +155,8 @@ static void cabinet_loadscript(cabinet_t* cabinet)
     luaL_openlibs(cabinet->L);
     status = luaL_loadfile(cabinet->L, cabinet->script_file);
     if (status) {
-        console_print(FormatText("{ff0000ff}Failed to init script (%s) (%d)", lua_tostring(cabinet->L, -1), status));
-        cabinet->errored = true;
-        return;
+        console_print(FormatText("{0xff0000}Failed to init script (%s) (%d)", lua_tostring(cabinet->L, -1), status));
+        luaL_loadstring(cabinet->L, NOSCRIPT);
     }
     
     // arcade table
@@ -283,10 +282,7 @@ void cabinet_reload(cabinet_t* cabinet)
     lua_getglobal(cabinet->L, "init");
     lua_pcall(cabinet->L, 0, 0, NULL);
     
-    const char* text = LoadText(cabinet->script_file);
-    cabinet->hash = xcrc32((const unsigned char*)text, strlen(text), 0xffffffff);
     
-    printf("\t\tHASH FOR %s IS %u\n", cabinet->script_file, cabinet->hash);
     
 }
 
@@ -308,6 +304,7 @@ void cabinet_update(cabinet_t* cabinet)
 {
     if (IsKeyPressed(KEY_ESCAPE)) {
         cabinet->interacting = false;
+        discordhelper_setarcade(NULL, 0);
     }
     
     if (!cabinet->errored) {

@@ -12,7 +12,7 @@ ifeq ($(OS),Windows_NT)
 	OUT = $(NAME).exe
 	# CC += clang
 	LDFLAGS += -static
-	LIBS = -lraylib -lopengl32 -lgdi32 -llua
+	LIBS = -lraylib -lopengl32 -lgdi32 -llua -ldiscord-rpc -lstdc++ -lpthread
 else
 	OUT = $(NAME)
 	# CC += clang

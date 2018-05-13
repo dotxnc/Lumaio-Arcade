@@ -9,7 +9,7 @@ void resource_loadmetadata(const char* mapfile)
     
     fp = fopen(mapfile, "r");
     if (fp == NULL) {
-        printf("Failed to load resource metadata file");
+        printf("Failed to load resource metadata file\n");
     }
     
     while (fgets(line, 256, fp) != NULL) {

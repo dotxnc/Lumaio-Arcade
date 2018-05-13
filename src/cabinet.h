@@ -18,10 +18,23 @@
     #include <lualib.h>
 #endif
 
+#define NOSCRIPT " \
+        function init() end \
+        function update(dt) end \
+        function draw() \
+            local tw = arcade.GetTextWidth(\"NO SCRIPT LOADED\", 20) \
+            arcade.SetColor(255, 0, 0, 255)\
+            arcade.DrawRectangle(\"fill\", math.floor(arcade.width/2-tw/2), arcade.height/2-10, tw, 20) \
+            arcade.SetColor(255, 255, 255, 255) \
+            arcade.DrawText(\"NO SCRIPT LOADED\", math.floor(arcade.width/2-tw/2), arcade.height/2-10, 20) \
+        end \
+        "
+
 #include "resource.h"
 #include "world.h"
 #include "util/hashmap.h"
 #include "console.h"
+#include "util/discordhelper.h"
 
 typedef struct cabinet_t {
     Model* machine;

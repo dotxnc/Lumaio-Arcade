@@ -1,17 +1,17 @@
-] this is a manifest file for a map
+] map manifest file
 ] syntax:
 ]       <value> <options>
 ] types:
 ]       mesh <path> - the map mesh
 ]       texture <path> - the map texture
-]       arcade <x> <y> <z> <id> <script> <model_id> - arcade
+]       arcade <x> <y> <z> <rx> <ry> <rz> <id> <script> <model_id> - arcade
 
 mesh assets/models/test_map.obj
-arcade -4.5 0 5 test1 none arcade2
-arcade -1.5 0 5 test2 none arcade2
-arcade  1.5 0 5 test3 none arcade2
-arcade  4.5 0 5 test4 none arcade2
-arcade -4.5 0 0 test5 none arcade2
-arcade -1.5 0 0 test6 none arcade2
-arcade  1.5 0 0 test7 none arcade2
-arcade  4.5 0 0 test8 none arcade2
+arcade -4.5 0 -5 0 0 0 test1 assets/scripts/games/snake2.lua arcade2
+arcade -1.5 0 -5 0 0 0 test2 assets/scripts/games/test.lua arcade2
+arcade  1.5 0 -5 0 0 0 test3 none arcade2
+arcade  4.5 0 -5 0 0 0 test4 none arcade2
+arcade -4.5 0 0 0 0 0 test5 none arcade2
+arcade -1.5 0 0 0 0 0 test6 none arcade2
+arcade  1.5 0 0 0 0 0 test7 none arcade2
+arcade  4.5 0 0 0 0 0 test8 none arcade2

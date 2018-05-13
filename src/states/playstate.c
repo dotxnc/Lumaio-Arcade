@@ -4,6 +4,7 @@
 #include "../cabinet.h"
 #include "../console.h"
 #include "../util/raylibext.h"
+#include "../util/discordhelper.h"
 
 static cabinet_t arcade1;
 static cabinet_t arcade2;
@@ -17,13 +18,11 @@ static Vector3 light_position = (Vector3){1.5, 3, 2};
 static Shader* gbuffer;
 static Shader* lighting;
 
-static Model ground;
-static Model world_model;
-
 void play_init()
 {
     console_init();
     
+    // TODO: move to resource manifest file???
     gbuffer = resource_getshader("gbuffer");
     gbuffer->locs[LOC_MATRIX_MODEL] = GetShaderLocation(*gbuffer, "modelMatrix");
     gbuffer->locs[LOC_MATRIX_VIEW] = GetShaderLocation(*gbuffer, "viewMatrix");
@@ -32,46 +31,15 @@ void play_init()
     
     lighting = resource_getshader("lighting");
     
+    // TODO: move to resource manifest file
     SetModelShader(resource_getmodel("arcade1"), *gbuffer);
     SetModelShader(resource_getmodel("arcade2"), *gbuffer);
-    
     SetModelShader(resource_getmodel("arcade1_screen"), *gbuffer);
     SetModelShader(resource_getmodel("arcade2_screen"), *gbuffer);
+    SetModelMap(resource_getmodel("arcade2"), MAP_EMISSION, *resource_gettexture("Arcade2_emission"));
     
-    cabinet_init(&arcade1, "arcade1", "assets/scripts/games/test.lua");
-    cabinet_init(&arcade2, "arcade2", "assets/scripts/games/snake.lua");
-    cabinet_init(&arcade3, "arcade2", "assets/scripts/games/space_invaders.lua");
-    cabinet_init(&arcade4, "arcade2", "assets/scripts/games/snake2.lua");
-    
-    cabinet_rotate(&arcade1, 0, -0.3, 0);
-    cabinet_rotate(&arcade2, 0, 0.3, 0);
-    cabinet_rotate(&arcade3, 0, 0.1, 0);
-    cabinet_rotate(&arcade4, 0, 0.1, 0);
-    
-    // cabinet_setshader(&arcade2, "vignette");
-    // cabinet_setshader(&arcade3, "vignette");
-    
-    arcade2.position = (Vector3){3, 0, -0.75};
-    arcade3.position = (Vector3){-3, 0, -0.75};
-    arcade4.position = (Vector3){-1, 0, -5};
-    
-    ground = LoadModelFromMesh(GenMeshPlane(100, 100, 5, 5));
-    ground.material.shader = *gbuffer;
-    SetModelMap(&ground, MAP_DIFFUSE, GetTextureDefault());
-    SetModelMap(&ground, MAP_SPECULAR, GetTextureDefault());
-    SetModelMap(&ground, MAP_NORMAL, GetTextureDefault());
-    
-    world_model = LoadModel("assets/models/test_map.obj");
-    world_model.material.shader = *gbuffer;
-    SetModelMap(&world_model, MAP_DIFFUSE, GetTextureDefault());
-    SetModelMap(&world_model, MAP_SPECULAR, GetTextureDefault());
-    SetModelMap(&world_model, MAP_NORMAL, GetTextureDefault());
-    SetModelMap(&world_model, MAP_EMISSION, GetTransparentTexture());
-    
-    hashmap_pushvalue(world_getarcades(), "test", &arcade1);
-    hashmap_pushvalue(world_getarcades(), "snake", &arcade2);
-    hashmap_pushvalue(world_getarcades(), "invaders", &arcade3);
-    hashmap_pushvalue(world_getarcades(), "snake2", &arcade4);
+    // initialize world from world file
+    world_initialize("assets/maps/test.txt");
     
     // Camera camera = { 0 };
     camera.position = (Vector3){ 0.f, 3.5f, 1.f };
@@ -85,10 +53,9 @@ void play_init()
 void play_update(float dt)
 {
     
+    // TODO: move to console
     lua_State* cl = console_getstate();
-    
     lua_newtable(cl); // CAMERA
-    
     lua_newtable(cl); // POSITON
         lua_pushnumber(cl, camera.position.x);
         lua_rawseti(cl, -2, 1);
@@ -97,7 +64,6 @@ void play_update(float dt)
         lua_pushnumber(cl, camera.position.z);
         lua_rawseti(cl, -2, 3);
     lua_setfield(cl, -2, "position");
-    
     lua_newtable(cl); // TARGET
         lua_pushnumber(cl, camera.position.x);
         lua_rawseti(cl, -2, 1);
@@ -106,7 +72,8 @@ void play_update(float dt)
         lua_pushnumber(cl, camera.position.z);
         lua_rawseti(cl, -2, 3);
     lua_setfield(cl, -2, "target");
-    
+    lua_pushnumber(cl, camera.fovy);
+    lua_setfield(cl, -2, "fov");
     lua_setglobal(cl, "camera");
     
     SetShaderVector3(*lighting, "viewpos", camera.position);
@@ -115,27 +82,7 @@ void play_update(float dt)
         console_toggle();
     }
     
-    hashmap_t* current = world_getarcades();
-    while (current != NULL) {
-        cabinet_t* ptr = current->value;
-        if (ptr != NULL) {
-            cabinet_update(ptr);
-            // interact
-            if (IsKeyPressed(KEY_E)) {
-                Ray r;
-                r.position = camera.position;
-                r.direction = Vector3Subtract(camera.target, camera.position);
-                
-                RayHitInfo h = GetCollisionRayModel(r, ptr->screen);
-                if (h.hit) {
-                    interacting = true;
-                    ptr->interacting = true;
-                    break;
-                }
-            }
-        }
-        current = current->next;
-    }
+    world_update(dt, camera, &interacting);
     
     console_update();
     
@@ -157,33 +104,14 @@ void play_update(float dt)
 void play_draw()
 {
     BeginMode3D(camera);
-        DrawModel(world_model, Vector3Zero(), 1, WHITE);
-        hashmap_t* current = world_getarcades();
-        while (current != NULL) {
-            cabinet_t* ptr = current->value;
-            if (ptr != NULL) {
-                cabinet_draw(ptr);
-            }
-            current = current->next;
-        }
-        
-        DrawSphereWires((Vector3){0, 3, 1.5}, 0.1, 10, 10, WHITE);
-        DrawSphereWires((Vector3){-3, 3, 1.5}, 0.1, 10, 10, WHITE);
-        DrawSphereWires((Vector3){3, 3, 1.5}, 0.1, 10, 10, WHITE);
+        world_draw();
     EndMode3D();
     
 }
 
 void play_alt_draw()
 {
-    hashmap_t* current = world_getarcades();
-    while (current != NULL) {
-        cabinet_t* ptr = current->value;
-        if (ptr != NULL) {
-            cabinet_drawgame(ptr);
-        }
-        current = current->next;
-    }
+    world_alt_draw();
 }
 
 void play_ui_draw()

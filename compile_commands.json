@@ -4,64 +4,16 @@
             "cc",
             "-c",
             "-o",
-            "obj/states/editorstate.o",
+            "obj/util/gbuffer.o",
             "--std=c11",
             "-Wno-incompatible-pointer-types",
             "-Wno-int-conversion",
             "-Wno-unused-value",
             "-Isrc/",
-            "src\\states\\editorstate.c"
+            "src\\util\\gbuffer.c"
         ],
         "directory": "C:\\Users\\patri\\Desktop\\Projects\\Arcade Game",
-        "file": "src\\states\\editorstate.c"
-    },
-    {
-        "arguments": [
-            "cc",
-            "-c",
-            "-o",
-            "obj/main.o",
-            "--std=c11",
-            "-Wno-incompatible-pointer-types",
-            "-Wno-int-conversion",
-            "-Wno-unused-value",
-            "-Isrc/",
-            "src\\main.c"
-        ],
-        "directory": "C:\\Users\\patri\\Desktop\\Projects\\Arcade Game",
-        "file": "src\\main.c"
-    },
-    {
-        "arguments": [
-            "cc",
-            "-c",
-            "-o",
-            "obj/states/playstate.o",
-            "--std=c11",
-            "-Wno-incompatible-pointer-types",
-            "-Wno-int-conversion",
-            "-Wno-unused-value",
-            "-Isrc/",
-            "src\\states\\playstate.c"
-        ],
-        "directory": "C:\\Users\\patri\\Desktop\\Projects\\Arcade Game",
-        "file": "src\\states\\playstate.c"
-    },
-    {
-        "arguments": [
-            "cc",
-            "-c",
-            "-o",
-            "obj/util/hashmap.o",
-            "--std=c11",
-            "-Wno-incompatible-pointer-types",
-            "-Wno-int-conversion",
-            "-Wno-unused-value",
-            "-Isrc/",
-            "src\\util\\hashmap.c"
-        ],
-        "directory": "C:\\Users\\patri\\Desktop\\Projects\\Arcade Game",
-        "file": "src\\util\\hashmap.c"
+        "file": "src\\util\\gbuffer.c"
     },
     {
         "arguments": [
@@ -84,16 +36,48 @@
             "cc",
             "-c",
             "-o",
-            "obj/cabinet.o",
+            "obj/util/array.o",
             "--std=c11",
             "-Wno-incompatible-pointer-types",
             "-Wno-int-conversion",
             "-Wno-unused-value",
             "-Isrc/",
-            "src\\cabinet.c"
+            "src\\util\\array.c"
         ],
         "directory": "C:\\Users\\patri\\Desktop\\Projects\\Arcade Game",
-        "file": "src\\cabinet.c"
+        "file": "src\\util\\array.c"
+    },
+    {
+        "arguments": [
+            "cc",
+            "-c",
+            "-o",
+            "obj/main.o",
+            "--std=c11",
+            "-Wno-incompatible-pointer-types",
+            "-Wno-int-conversion",
+            "-Wno-unused-value",
+            "-Isrc/",
+            "src\\main.c"
+        ],
+        "directory": "C:\\Users\\patri\\Desktop\\Projects\\Arcade Game",
+        "file": "src\\main.c"
+    },
+    {
+        "arguments": [
+            "cc",
+            "-c",
+            "-o",
+            "obj/util/discordhelper.o",
+            "--std=c11",
+            "-Wno-incompatible-pointer-types",
+            "-Wno-int-conversion",
+            "-Wno-unused-value",
+            "-Isrc/",
+            "src\\util\\discordhelper.c"
+        ],
+        "directory": "C:\\Users\\patri\\Desktop\\Projects\\Arcade Game",
+        "file": "src\\util\\discordhelper.c"
     },
     {
         "arguments": [
@@ -116,16 +100,32 @@
             "cc",
             "-c",
             "-o",
-            "obj/resource.o",
+            "obj/cabinet.o",
             "--std=c11",
             "-Wno-incompatible-pointer-types",
             "-Wno-int-conversion",
             "-Wno-unused-value",
             "-Isrc/",
-            "src\\resource.c"
+            "src\\cabinet.c"
         ],
         "directory": "C:\\Users\\patri\\Desktop\\Projects\\Arcade Game",
-        "file": "src\\resource.c"
+        "file": "src\\cabinet.c"
+    },
+    {
+        "arguments": [
+            "cc",
+            "-c",
+            "-o",
+            "obj/states/playstate.o",
+            "--std=c11",
+            "-Wno-incompatible-pointer-types",
+            "-Wno-int-conversion",
+            "-Wno-unused-value",
+            "-Isrc/",
+            "src\\states\\playstate.c"
+        ],
+        "directory": "C:\\Users\\patri\\Desktop\\Projects\\Arcade Game",
+        "file": "src\\states\\playstate.c"
     },
     {
         "arguments": [
@@ -148,16 +148,32 @@
             "cc",
             "-c",
             "-o",
-            "obj/util/array.o",
+            "obj/states/editorstate.o",
             "--std=c11",
             "-Wno-incompatible-pointer-types",
             "-Wno-int-conversion",
             "-Wno-unused-value",
             "-Isrc/",
-            "src\\util\\array.c"
+            "src\\states\\editorstate.c"
         ],
         "directory": "C:\\Users\\patri\\Desktop\\Projects\\Arcade Game",
-        "file": "src\\util\\array.c"
+        "file": "src\\states\\editorstate.c"
+    },
+    {
+        "arguments": [
+            "cc",
+            "-c",
+            "-o",
+            "obj/resource.o",
+            "--std=c11",
+            "-Wno-incompatible-pointer-types",
+            "-Wno-int-conversion",
+            "-Wno-unused-value",
+            "-Isrc/",
+            "src\\resource.c"
+        ],
+        "directory": "C:\\Users\\patri\\Desktop\\Projects\\Arcade Game",
+        "file": "src\\resource.c"
     },
     {
         "arguments": [
@@ -174,5 +190,21 @@
         ],
         "directory": "C:\\Users\\patri\\Desktop\\Projects\\Arcade Game",
         "file": "src\\util\\linit.c"
+    },
+    {
+        "arguments": [
+            "cc",
+            "-c",
+            "-o",
+            "obj/util/hashmap.o",
+            "--std=c11",
+            "-Wno-incompatible-pointer-types",
+            "-Wno-int-conversion",
+            "-Wno-unused-value",
+            "-Isrc/",
+            "src\\util\\hashmap.c"
+        ],
+        "directory": "C:\\Users\\patri\\Desktop\\Projects\\Arcade Game",
+        "file": "src\\util\\hashmap.c"
     }
 ]

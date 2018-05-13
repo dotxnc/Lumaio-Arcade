@@ -41,6 +41,7 @@ void game_init(game_t *game, int width, int height, void *title) {
     
     game->gamestate = NULL;
     
+    SetTraceLog(0);
     InitWindow(width, height, title);
     SetMousePosition((Vector2){0, 0});
     SetTargetFPS(60);
@@ -191,6 +192,7 @@ void game_start(game_t *game) {
             }
             
             game->gamestate->game_ui_draw();
+            DrawText(FormatText("FPS: %d", GetFPS()), 10, 10, 20, WHITE);
         EndDrawing();
     }
 }

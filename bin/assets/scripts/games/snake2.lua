@@ -1,4 +1,6 @@
 
+arcade.name = "Snake V2"
+
 local DrawText = arcade.DrawText
 local DrawRectangle = arcade.DrawRectangle
 local LoadTexture = arcade.LoadTexture

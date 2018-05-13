@@ -22,5 +22,9 @@ fshader lighting assets/shaders/deferred/lighting.fs
 fshader ssao     assets/shaders/deferred/ssao.fs
 fshader blur     assets/shaders/deferred/blur.fs
 fshader emission assets/shaders/deferred/emission.fs
+fshader bloom    assets/shaders/deferred/bloom.fs
+fshader blur2    assets/shaders/deferred/blur2.fs
+fshader combine  assets/shaders/deferred/combine.fs
 
 ] textures
+texture Arcade2_emission assets/textures/Arcade2_emission.png
