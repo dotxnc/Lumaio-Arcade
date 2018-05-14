@@ -380,4 +380,6 @@ void cabinet_free(cabinet_t* cabinet)
 {
     if (cabinet->L != NULL)
         lua_close(cabinet->L);
+    UnloadRenderTexture(cabinet->target);
+    UnloadRenderTexture(cabinet->temp);
 }

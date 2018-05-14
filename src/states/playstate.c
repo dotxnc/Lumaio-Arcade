@@ -13,11 +13,64 @@ static Vector2 save_mouse = (Vector2){0, 0};
 static Shader* gbuffer;
 static Shader* lighting;
 
+static void camera_update(Camera3D* c, float speed)
+{
+    printf("FUCK");
+    DisableCursor();
+    
+    static Vector3 camera_angle = {0.f};
+    
+    static Vector2 mouse_prev = {0.f};
+    Vector2 mouse_delta = {0.f};
+    Vector2 mouse_now = GetMousePosition();
+    
+    mouse_delta.x = mouse_now.x - mouse_prev.x;
+    mouse_delta.y = mouse_now.y - mouse_prev.y;
+    mouse_prev = mouse_now;
+    
+    camera_angle.x += mouse_delta.x*0.003;
+    camera_angle.y += -mouse_delta.y*0.003;
+    camera_angle.y = Clamp(camera_angle.y, -89.f*DEG2RAD, 89.f*DEG2RAD);
+    printf("%.2f\r", camera_angle.y);
+    
+    Vector3 front;
+    front.x = cos(camera_angle.y) * cos(camera_angle.x);
+    front.y = sin(camera_angle.y);
+    front.z = cos(camera_angle.y) * sin(camera_angle.x);
+    Vector3 cf = Vector3Normalize(front);
+    
+    if (IsKeyDown(KEY_W)) {
+        float dx = cosf(camera_angle.x);
+        float dy = sinf(camera_angle.x);
+        c->position.x += dx*(speed*GetFrameTime());
+        c->position.z += dy*(speed*GetFrameTime());
+        // camera.position = Vector3Add(camera.position, Vector3Multiply(cf, speed*GetFrameTime()));
+    }
+    if (IsKeyDown(KEY_S)) {
+        float dx = cosf(camera_angle.x);
+        float dy = sinf(camera_angle.x);
+        c->position.x -= dx*(speed*GetFrameTime());
+        c->position.z -= dy*(speed*GetFrameTime());
+        // camera.position = Vector3Subtract(camera.position, Vector3Multiply(cf, speed*GetFrameTime()));
+    }
+    if (IsKeyDown(KEY_A)) {
+        c->position = Vector3Subtract(c->position, Vector3Multiply(Vector3Normalize(Vector3CrossProduct(cf, c->up)), speed*GetFrameTime()));
+    }
+    if (IsKeyDown(KEY_D)) {
+        c->position = Vector3Add(c->position, Vector3Multiply(Vector3Normalize(Vector3CrossProduct(cf, c->up)), speed*GetFrameTime()));
+    }
+    
+    c->target = Vector3Add(c->position, cf);
+}
+
 void play_init()
 {
     lighting = resource_getshader("lighting");
     console_init();
-    world_initialize("assets/maps/test.txt");
+    for (int i = 0; i < 1; i++) {
+        world_free();
+        world_initialize("assets/maps/test.txt");
+    }
     
     // Camera camera = { 0 };
     camera.position = (Vector3){ 0.f, 3.5f, 1.f };
@@ -25,7 +78,7 @@ void play_init()
     camera.up = (Vector3){ 0.0f, 1.0f, 0.0f };
     camera.fovy = 90.0f;
     camera.type = CAMERA_PERSPECTIVE;
-    SetCameraMode(camera, CAMERA_FIRST_PERSON);
+    SetCameraMode(camera, CAMERA_FREE);
 }
 
 void play_update(float dt)
@@ -46,7 +99,7 @@ void play_update(float dt)
     if (console_isopen()) return;
     
     if (!interacting) {
-        UpdateCamera(&camera);
+        camera_update(&camera, 3);
         save_mouse = GetMousePosition();
     } else {
         if (IsKeyPressed(KEY_ESCAPE)) {

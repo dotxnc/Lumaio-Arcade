@@ -11,11 +11,13 @@ typedef struct hashmap_t {
     void* value;
     size_t size;
     struct hashmap_t* next;
+    struct hashmap_t* prev;
 } hashmap_t;
 
 unsigned long hashmap_hash(const char*);
 void hashmap_push(hashmap_t*, const char*, void*, size_t);
 void hashmap_pushvalue(hashmap_t*, const char*, void*);
+void hashmap_free(hashmap_t*);
 void* hashmap_get(hashmap_t*, const char*);
 
 #endif

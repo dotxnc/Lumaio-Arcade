@@ -2,6 +2,7 @@
 
 void world_initialize(const char* file)
 {
+    
     FILE* fp;
     char line[256];
     size_t len = 0;
@@ -50,6 +51,7 @@ void world_initialize(const char* file)
         }
         
     }
+    fclose(fp);
 }
 
 void world_update(float dt, Camera3D camera, bool* interacting)
@@ -121,6 +123,8 @@ void world_free()
         }
         current = current->next;
     }
+    hashmap_free(&world_arcades);
+    UnloadMesh(&world_model.mesh);
 }
 
 hashmap_t* world_getarcades() {

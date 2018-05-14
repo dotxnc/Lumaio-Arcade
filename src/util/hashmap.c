@@ -23,6 +23,7 @@ void hashmap_push(hashmap_t* map, const char* key, void* data, size_t size)
     current->next->key = hash;
     current->next->value = malloc(size);
     current->next->next = NULL;
+    current->next->prev = current;
     memcpy(current->next->value, data, size);
 }
 
@@ -38,6 +39,23 @@ void hashmap_pushvalue(hashmap_t* map, const char* key, void* ptr)
     current->next->key = hash;
     current->next->value = ptr;
     current->next->next = NULL;
+    current->next->prev = current;
+}
+
+void hashmap_free(hashmap_t* map)
+{
+    hashmap_t* current = map;
+    while (current->next != NULL) {
+        current = current->next;
+    }
+    while (current->prev != NULL) {
+        current = current->prev;
+        free(current->next->value);
+        free(current->next);
+        current->next = NULL;
+    }
+    free(current->next);
+    current->next = NULL;
 }
 
 void* hashmap_get(hashmap_t* map, const char* key)

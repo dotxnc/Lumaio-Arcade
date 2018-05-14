@@ -44,7 +44,7 @@ void game_init(game_t *game, int width, int height, void *title) {
     SetTraceLog(0);
     InitWindow(width, height, title);
     SetMousePosition((Vector2){0, 0});
-    SetTargetFPS(60);
+    // SetTargetFPS(60);
     SetExitKey(KEY_F12);
     
     resource_loadmetadata("assets/metadata.txt");
