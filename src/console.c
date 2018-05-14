@@ -119,6 +119,30 @@ const char* console_call()
     return NULL;
 }
 
+void console_pushcamera(Camera3D camera)
+{
+    lua_newtable(console_L); // CAMERA
+    lua_newtable(console_L); // POSITON
+        lua_pushnumber(console_L, camera.position.x);
+        lua_rawseti(console_L, -2, 1);
+        lua_pushnumber(console_L, camera.position.y-3.5);
+        lua_rawseti(console_L, -2, 2);
+        lua_pushnumber(console_L, camera.position.z);
+        lua_rawseti(console_L, -2, 3);
+    lua_setfield(console_L, -2, "position");
+    lua_newtable(console_L); // TARGET
+        lua_pushnumber(console_L, camera.position.x);
+        lua_rawseti(console_L, -2, 1);
+        lua_pushnumber(console_L, camera.position.y-3.5);
+        lua_rawseti(console_L, -2, 2);
+        lua_pushnumber(console_L, camera.position.z);
+        lua_rawseti(console_L, -2, 3);
+    lua_setfield(console_L, -2, "target");
+    lua_pushnumber(console_L, camera.fovy);
+    lua_setfield(console_L, -2, "fov");
+    lua_setglobal(console_L, "camera");
+}
+
 //_________________________________________________________________________________//
 
 static bool isa(char a) {

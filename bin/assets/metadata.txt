@@ -7,6 +7,9 @@
 ]       shader - combined glsl shader
 ]       vshader - vertex glsl shader
 ]       fshader - fragment glsl shader
+]       mshader - model shader
+]       mmap - model map
+]       smap - shader uniform mapping
 
 ] models
 model arcade1 assets/models/Arcade1.obj assets/textures/Arcade1_texture.png
@@ -27,4 +30,18 @@ fshader blur2    assets/shaders/deferred/blur2.fs
 fshader combine  assets/shaders/deferred/combine.fs
 
 ] textures
-texture Arcade2_emission assets/textures/Arcade2_emission.png
+texture arcade2_emission assets/textures/Arcade2_emission.png
+
+] shader and texture mapping
+
+smap gbuffer LOC_MATRIX_MODEL      modelMatrix
+smap gbuffer LOC_MATRIX_VIEW       viewMatrix
+smap gbuffer LOC_MATRIX_PROJECTION projectionMatrix
+smap gbuffer LOC_MAP_EMISSION      texture5
+
+mshader arcade1        gbuffer
+mshader arcade2        gbuffer
+mshader arcade1_screen gbuffer
+mshader arcade2_screen gbuffer
+
+mmap arcade2 MAP_EMISSION arcade2_emission

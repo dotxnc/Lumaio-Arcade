@@ -42,7 +42,7 @@ void discordhelper_initialize()
     discordhelper_presence.state = "";
     discordhelper_presence.startTimestamp = time(NULL);
     discordhelper_presence.endTimestamp = 0;
-    discordhelper_presence.largeImageKey = "";
+    discordhelper_presence.largeImageKey = "icon2";
     discordhelper_presence.smallImageKey = "";
     discordhelper_presence.partyMax = 0;
     discordhelper_presence.partySize = 0;

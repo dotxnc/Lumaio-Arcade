@@ -1,5 +1,20 @@
 #include "resource.h"
 
+static int resource_metatomap(const char* n)
+{
+    if (strcmp(n, "MAP_EMISSION")==0) return MAP_EMISSION;
+    return -1;
+}
+
+static int resource_metatoloc(const char* n)
+{
+    if (strcmp(n, "LOC_MATRIX_MODEL")==0) return LOC_MATRIX_MODEL;
+    if (strcmp(n, "LOC_MATRIX_VIEW")==0) return LOC_MATRIX_VIEW;
+    if (strcmp(n, "LOC_MATRIX_PROJECTION")==0) return LOC_MATRIX_PROJECTION;
+    if (strcmp(n, "LOC_MAP_EMISSION")==0) return LOC_MAP_EMISSION;
+    return -1;
+}
+
 void resource_loadmetadata(const char* mapfile)
 {
     FILE* fp;
@@ -41,7 +56,24 @@ void resource_loadmetadata(const char* mapfile)
         else if (strcmp(metadata[0], "vshader") == 0) {
             resource_loadshader(metadata[2], NULL, metadata[1]);
         }
-        
+        else if (strcmp(metadata[0], "smap") == 0) {
+            Shader* s = resource_getshader(metadata[1]);
+            int loc = resource_metatoloc(metadata[2]);
+            if (loc > -1) {
+                s->locs[loc] = GetShaderLocation(*s, metadata[3]);
+            }
+        }
+        else if (strcmp(metadata[0], "mshader") == 0) {
+            Model* m = resource_getmodel(metadata[1]);
+            m->material.shader = *resource_getshader(metadata[2]); 
+        }
+        else if (strcmp(metadata[0], "mmap") == 0) {
+            Model* m = resource_getmodel(metadata[1]);
+            int map = resource_metatomap(metadata[2]);
+            if (map > -1) {
+                m->material.maps[map].texture = *resource_gettexture(metadata[3]);
+            }
+        }
         printf("LOAD RESOURCE: %s %s %s\n", metadata[0], metadata[1], metadata[2]);
     }
 }

@@ -97,7 +97,7 @@ void gbuffer_init(gbuffer_t* gbuffer, int width, int height)
             case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT: TraceLog(LOG_WARNING, "Framebuffer incomplete missing attachment"); break;
         }
     }
-    printf("\t\tFRAMEBUFFER STATUS : %d : %s\n", status, status==GL_FRAMEBUFFER_COMPLETE?"TRUE":"FALSE");
+    printf("FRAMEBUFFER STATUS : %d : %s\n", status, status==GL_FRAMEBUFFER_COMPLETE?"TRUE":"FALSE");
     
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     

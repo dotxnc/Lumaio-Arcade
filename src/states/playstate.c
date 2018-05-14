@@ -6,39 +6,17 @@
 #include "../util/raylibext.h"
 #include "../util/discordhelper.h"
 
-static cabinet_t arcade1;
-static cabinet_t arcade2;
-static cabinet_t arcade3;
-static cabinet_t arcade4;
 static Camera camera = { 0 };
 static bool interacting = false;
 static Vector2 save_mouse = (Vector2){0, 0};
-static Vector3 light_position = (Vector3){1.5, 3, 2};
 
 static Shader* gbuffer;
 static Shader* lighting;
 
 void play_init()
 {
-    console_init();
-    
-    // TODO: move to resource manifest file???
-    gbuffer = resource_getshader("gbuffer");
-    gbuffer->locs[LOC_MATRIX_MODEL] = GetShaderLocation(*gbuffer, "modelMatrix");
-    gbuffer->locs[LOC_MATRIX_VIEW] = GetShaderLocation(*gbuffer, "viewMatrix");
-    gbuffer->locs[LOC_MATRIX_PROJECTION] = GetShaderLocation(*gbuffer, "projectionMatrix");
-    gbuffer->locs[LOC_MAP_EMISSION] = GetShaderLocation(*gbuffer, "texture5");
-    
     lighting = resource_getshader("lighting");
-    
-    // TODO: move to resource manifest file
-    SetModelShader(resource_getmodel("arcade1"), *gbuffer);
-    SetModelShader(resource_getmodel("arcade2"), *gbuffer);
-    SetModelShader(resource_getmodel("arcade1_screen"), *gbuffer);
-    SetModelShader(resource_getmodel("arcade2_screen"), *gbuffer);
-    SetModelMap(resource_getmodel("arcade2"), MAP_EMISSION, *resource_gettexture("Arcade2_emission"));
-    
-    // initialize world from world file
+    console_init();
     world_initialize("assets/maps/test.txt");
     
     // Camera camera = { 0 };
@@ -53,28 +31,7 @@ void play_init()
 void play_update(float dt)
 {
     
-    // TODO: move to console
-    lua_State* cl = console_getstate();
-    lua_newtable(cl); // CAMERA
-    lua_newtable(cl); // POSITON
-        lua_pushnumber(cl, camera.position.x);
-        lua_rawseti(cl, -2, 1);
-        lua_pushnumber(cl, camera.position.y-3.5);
-        lua_rawseti(cl, -2, 2);
-        lua_pushnumber(cl, camera.position.z);
-        lua_rawseti(cl, -2, 3);
-    lua_setfield(cl, -2, "position");
-    lua_newtable(cl); // TARGET
-        lua_pushnumber(cl, camera.position.x);
-        lua_rawseti(cl, -2, 1);
-        lua_pushnumber(cl, camera.position.y-3.5);
-        lua_rawseti(cl, -2, 2);
-        lua_pushnumber(cl, camera.position.z);
-        lua_rawseti(cl, -2, 3);
-    lua_setfield(cl, -2, "target");
-    lua_pushnumber(cl, camera.fovy);
-    lua_setfield(cl, -2, "fov");
-    lua_setglobal(cl, "camera");
+    console_pushcamera(camera);
     
     SetShaderVector3(*lighting, "viewpos", camera.position);
     
@@ -122,9 +79,7 @@ void play_ui_draw()
 
 void play_quit()
 {
-    cabinet_free(&arcade1);
-    cabinet_free(&arcade2);
-    cabinet_free(&arcade3);
+    world_free();
 }
 
 void play_enter(gamestate_t* prev)

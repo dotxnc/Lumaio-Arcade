@@ -38,6 +38,8 @@ void console_pushstring(const char*);
 void console_pushnumber(lua_Number);
 const char* console_call();
 
+void console_pushcamera(Camera3D);
+
 // console functions
 void console_init();
 void console_print(const char*);

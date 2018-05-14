@@ -86,7 +86,7 @@ Texture2D GetTransparentTexture()
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
         glBindTexture(GL_TEXTURE_2D, 0);
         init = true;
-        printf("\t\ttransparent texture initialized\n");
+        printf("transparent texture initialized\n");
     }
     return texture;
 }

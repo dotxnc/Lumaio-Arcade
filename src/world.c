@@ -111,6 +111,18 @@ void world_alt_draw()
     }
 }
 
+void world_free()
+{
+    hashmap_t* current = world_getarcades();
+    while (current != NULL) {
+        cabinet_t* ptr = current->value;
+        if (ptr != NULL) {
+            cabinet_free(ptr);
+        }
+        current = current->next;
+    }
+}
+
 hashmap_t* world_getarcades() {
     return &world_arcades;
 }

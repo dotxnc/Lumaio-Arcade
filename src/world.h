@@ -13,6 +13,7 @@ void world_initialize(const char*);
 void world_update(float, Camera3D, bool*);
 void world_draw();
 void world_alt_draw();
+void world_free();
 hashmap_t* world_getarcades();
 
 #endif
